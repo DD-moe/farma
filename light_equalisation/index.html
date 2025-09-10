@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prezentacja Projektu HPTLC</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      padding-top: 70px;
+    }
+    .segment {
+      padding: 50px 0;
+    }
+    .level-content {
+      display: none;
+    }
+    .level-content.active {
+      display: block;
+    }
+    footer {
+      background-color: #f8f9fa;
+      padding: 20px 0;
+      text-align: center;
+      font-size: 0.9rem;
+      border-top: 1px solid #dee2e6;
+    }
+    .level-expl {
+      font-style: italic;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Projekt HPTLC</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#intro">Wstęp</a></li>
+          <li class="nav-item"><a class="nav-link" href="#segment1">Cel</a></li>
+          <li class="nav-item"><a class="nav-link" href="#segment2">Metoda</a></li>
+          <li class="nav-item"><a class="nav-link" href="#segment3">Wyniki</a></li>
+          <li class="nav-item"><a class="nav-link" href="#segment4">Zastosowania</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Wstęp -->
+  <section id="intro" class="segment bg-light">
+    <div class="container">
+      <h2 class="mb-4">Wstęp</h2>
+      <p>
+        Każdy segment tej strony jest dostępny w trzech poziomach językowych: 
+        <strong>techniczny</strong>, <strong)naukowy</strong> i <strong>popularno-naukowy</strong>. 
+        Wybierając poziom, decydujesz, jak szczegółowe informacje chcesz zobaczyć: 
+      </p>
+      <ul>
+        <li><strong>Techniczny:</strong> pełne szczegóły praktyczne i techniczne.</li>
+        <li><strong>Naukowy:</strong> główne wnioski i podstawowe informacje naukowe.</li>
+        <li><strong>Popularno-naukowy:</strong> uproszczone objaśnienia, dygresje i definicje dla osób niezaznajomionych z dziedziną.</li>
+      </ul>
+      <p>Możesz przełączać poziomy w dowolnym segmencie, aby dopasować treść do swojego poziomu wiedzy.</p>
+    </div>
+  </section>
+
+  <!-- Segment 1: Cel -->
+  <section id="segment1" class="segment">
+    <div class="container">
+      <h2 class="mb-4">Cel projektu</h2>
+      <div class="level-expl">
+        Wybierz język / poziom szczegółowości: Techniczny, Naukowy lub Popularno-naukowy.
+      </div>
+      <div class="btn-group mb-3" role="group" aria-label="Poziom zaawansowania">
+        <button type="button" class="btn btn-primary" onclick="showLevel('segment1','tech')">Techniczny</button>
+        <button type="button" class="btn btn-secondary" onclick="showLevel('segment1','sci')">Naukowy</button>
+        <button type="button" class="btn btn-success" onclick="showLevel('segment1','pop')">Popularno-naukowy</button>
+      </div>
+      <div id="segment1-tech" class="level-content">
+        <p>Badanie skupia się na utrzymaniu jednolitego oświetlenia płytki 10x10 cm HPTLC w zakresie UV-C. Optymalizacja światła pozwala na redukcję gradientu intensywności do 0.05%.</p>
+      </div>
+      <div id="segment1-sci" class="level-content">
+        <p>Analiza obrazu płytek HPTLC wymaga ekstremalnie jednolitego oświetlenia, aby zminimalizować potrzebę cyfrowego wyrównywania. Różnica między najciemniejszym a najjaśniejszym obszarem wynosi tylko 0.05% przy 13-bitowej głębi koloru (0-2047).</p>
+      </div>
+      <div id="segment1-pop" class="level-content">
+        <p>Chcemy zrobić tak, żeby obraz płytki HPTLC był równomiernie oświetlony, dzięki czemu kamera pokaże dokładny rozkład chemikaliów, bez potrzeby poprawiania obrazu komputerowo.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Segmenty 2,3,4 – analogicznie do poprzedniej wersji, dodany element .level-expl -->
+  <!-- Segment 2: Metoda -->
+  <section id="segment2" class="segment bg-light">
+    <div class="container">
+      <h2 class="mb-4">Metoda</h2>
+      <div class="level-expl">
+        Wybierz język / poziom szczegółowości: Techniczny, Naukowy lub Popularno-naukowy.
+      </div>
+      <div class="btn-group mb-3" role="group">
+        <button type="button" class="btn btn-primary" onclick="showLevel('segment2','tech')">Techniczny</button>
+        <button type="button" class="btn btn-secondary" onclick="showLevel('segment2','sci')">Naukowy</button>
+        <button type="button" class="btn btn-success" onclick="showLevel('segment2','pop')">Popularno-naukowy</button>
+      </div>
+      <div id="segment2-tech" class="level-content">
+        <p>Użycie dyfuzorów i źródeł światła LED o wysokiej stabilności spektralnej. Pozycjonowanie kamer z precyzyjnym kalibratorem światła.</p>
+      </div>
+      <div id="segment2-sci" class="level-content">
+        <p>Metoda opiera się na symulacji rozkładu światła oraz eksperymentalnym ustawieniu źródeł LED. Celem jest osiągnięcie rozkładu jednolitego w granicach 0.05%, odzwierciedlając warunki laboratoryjne przy niskobudżetowej konstrukcji.</p>
+      </div>
+      <div id="segment2-pop" class="level-content">
+        <p>Rozkład światła na płytce jest kontrolowany przez specjalne lampy i „filtry”, żeby każdy fragment płytki był oświetlony jednakowo.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Segment 3: Wyniki -->
+  <section id="segment3" class="segment">
+    <div class="container">
+      <h2 class="mb-4">Wyniki</h2>
+      <div class="level-expl">
+        Wybierz język / poziom szczegółowości: Techniczny, Naukowy lub Popularno-naukowy.
+      </div>
+      <div class="btn-group mb-3" role="group">
+        <button type="button" class="btn btn-primary" onclick="showLevel('segment3','tech')">Techniczny</button>
+        <button type="button" class="btn btn-secondary" onclick="showLevel('segment3','sci')">Naukowy</button>
+        <button type="button" class="btn btn-success" onclick="showLevel('segment3','pop')">Popularno-naukowy</button>
+      </div>
+      <div id="segment3-tech" class="level-content">
+        <p>Różnica w intensywności między najciemniejszym a najjaśniejszym punktem <strong>0.05%</strong>. Dane uzyskane dla płytki 10x10 cm z kamerą 13-bitową.</p>
+      </div>
+      <div id="segment3-sci" class="level-content">
+        <p>Symulacje i eksperymenty potwierdzają, że fizyczne utrzymanie jednolitego oświetlenia minimalizuje potrzebę cyfrowego wyrównywania obrazu, co zwiększa wiarygodność analizy HPTLC.</p>
+      </div>
+      <div id="segment3-pop" class="level-content">
+        <p>Nasze ustawienia światła działają tak dobrze, że obraz płytki jest praktycznie idealny, bez konieczności komputerowego poprawiania jasności.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Segment 4: Zastosowania -->
+  <section id="segment4" class="segment bg-light">
+    <div class="container">
+      <h2 class="mb-4">Zastosowania</h2>
+      <div class="level-expl">
+        Wybierz język / poziom szczegółowości: Techniczny, Naukowy lub Popularno-naukowy.
+      </div>
+      <div class="btn-group mb-3" role="group">
+        <button type="button" class="btn btn-primary" onclick="showLevel('segment4','tech')">Techniczny</button>
+        <button type="button" class="btn btn-secondary" onclick="showLevel('segment4','sci')">Naukowy</button>
+        <button type="button" class="btn btn-success" onclick="showLevel('segment4','pop')">Popularno-naukowy</button>
+      </div>
+      <div id="segment4-tech" class="level-content">
+        <p>Utrzymanie bardzo jednolitego oświetlenia może być użyte w innych dziedzinach, np. w analizie spektroskopowej, mikroskopii UV-C, lub przy tworzeniu referencyjnych obrazów materiałów fluorescencyjnych.</p>
+      </div>
+      <div id="segment4-sci" class="level-content">
+        <p>Projekt wskazuje na możliwość tworzenia low-cost, ale precyzyjnych systemów oświetlenia do analiz chemicznych i fizycznych wymagających ekstremalnej jednolitości w UV-C.</p>
+      </div>
+      <div id="segment4-pop" class="level-content">
+        <p>Podobne systemy mogą być używane w laboratoriach lub szkołach, gdzie potrzebne jest bardzo równe oświetlenie do dokładnej obserwacji próbek chemicznych.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stopka -->
+  <footer>
+    <div class="container">
+      <p>Autor: Jan Kowalski | Licencja: CC BY-SA 4.0</p>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function showLevel(segment, level) {
+      const levels = ['tech', 'sci', 'pop'];
+      levels.forEach(l => {
+        const el = document.getElementById(segment + '-' + l);
+        if(el) el.classList.remove('active');
+      });
+      const activeEl = document.getElementById(segment + '-' + level);
+      if(activeEl) activeEl.classList.add('active');
+    }
+  </script>
+</body>
+</html>
