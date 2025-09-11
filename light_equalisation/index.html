@@ -333,13 +333,47 @@
         <button type="button" class="btn btn-success" onclick="showLevel('segment4','pop')">Popularno-naukowy</button>
       </div>
       <div id="segment4-tech" class="level-content">
-        <p>Utrzymanie bardzo jednolitego oświetlenia może być użyte w innych dziedzinach, np. w analizie spektroskopowej, mikroskopii UV-C, lub przy tworzeniu referencyjnych obrazów materiałów fluorescencyjnych.</p>
+
+        <h1>Praktyczne zastosowanie</h1>
+
+        <p>Implementacja jednolitego oświetlenia w systemach wizyjnych stanowi krytyczny element w osiąganiu wysokiej jakości i powtarzalności obrazowania. W konwencjonalnych systemach, rozkład intensywności światła, często opisywany przez funkcję Gaussa, wymaga cyfrowej korekcji pola jasności (flat-field correction) w post-processingu, co może prowadzić do utraty informacji o sygnale, artefaktów i zwiększenia szumów.</p>
+
+        <p>Nasze rozwiązanie, dostarczając jednolitość oświetlenia na poziomie 1:2500 eliminuje konieczność stosowania zaawansowanych algorytmów korekcji, co upraszcza architekturę oprogramowania do przetwarzania obrazu. W przypadku chromatografii cienkowarstwowej (TLC), gdzie analiza plam (powstałych w efekcie absorbcji przez molekuły światła uv, co skutkuje mniejszą fluorescencją wzbogaconego w emitery świała zielonego żelu) jest kluczowa, uproszczenie pipeline'u przetwarzania obrazu pozwala na bezpośrednie zastosowanie progowania adaptacyjnego lub innych prostych algorytmów segmentacji, co znacząco zwiększa szybkość i niezawodność automatycznej analizy danych.</p>
+
+        <p>W kontekście kalibracji matryc CMOS/CCD, ten system może być używany do generowania mapy szumów pikseli (PRNU - Photon Response Non-Uniformity) i szumów stałych (FPN - Fixed Pattern Noise) bez wpływu zmienności oświetlenia. To pozwala na precyzyjne określenie charakterystyki każdego piksela i optymalizację algorytmów korekcji, co jest krytyczne w produkcji sensorów optycznych. W przypadku matryc o rozmiarze 10x10 cm, jednolite oświetlenie umożliwia pełną, jednoczesną inspekcję, co jest niemożliwe przy standardowych, punktowych źródłach światła.</p>
+
+        <p>Nasza technologia otwiera także nowe możliwości w inspekcji powierzchni lustrzanych i transparentnych materiałów, takich jak szkło, soczewki czy panele słoneczne. Wady powierzchniowe, takie jak zarysowania czy wtrącenia, stają się widoczne jako lokalne odchylenia od idealnie jednorodnego oświetlenia, co umożliwia ich automatyczną detekcję z wysoką precyzją. Jest to szczególnie cenne w branży optycznej i półprzewodnikowej, gdzie nawet mikroskopijne defekty mogą wpływać na działanie finalnego produktu.</p>
+
       </div>
       <div id="segment4-sci" class="level-content">
-        <p>Projekt wskazuje na możliwość tworzenia low-cost, ale precyzyjnych systemów oświetlenia do analiz chemicznych i fizycznych wymagających ekstremalnej jednolitości w UV-C.</p>
+       
+        <h1>Praktyczne zastosowanie</h1>
+
+        <p>Nasze odkrycie, oparte na zapewnieniu niezwykle jednolitej iluminacji w zakresie UV (ze różnicą między min a max intensywności 1:2500), stanowi potencjalny przełom w wielu dziedzinach, w których analiza obrazu jest kluczowa. Zdolność do precyzyjnego oświetlenia płaskiej powierzchni 10x10 cm eliminuje niedoskonałości wynikające z niejednolitego rozkładu światła, co jest powszechnym problemem w standardowych systemach oświetleniowych.</p>
+
+        <p>Jednym z najważniejszych zastosowań jest chromatografia cienkowarstwowa (TLC). Standardowe systemy wizualizacji w TLC często wymagają zaawansowanych algorytmów korekcji jasności w celu ujednolicenia obrazu cyfrowego. Nasze rozwiązanie, poprzez dostarczenie jednolitego źródła światła UV, upraszcza ten proces. Pozwala to na znacznie prostsze i szybsze algorytmy detekcji i kwantyfikacji plam, ponieważ dane wejściowe są już optymalne.</p>
+
+        <p>Kolejnym obszarem jest optyczna kalibracja czujników obrazu. W przypadku kamer cyfrowych i czujników, nierówna wrażliwość pikseli na światło powoduje szumy i winietowanie, które następnie poddawane są cyfrowej korekcie przez procesor graficzny aparatu cyfrowego. Ta komora może służyć jako idealne źródło referencyjne do kalibracji, umożliwiając dokładne mapowanie odpowiedzi każdego piksela na stałe, jednorodne oświetlenie. </p>
+
+        <p>Innym zastosowaniem jednak o mniejszym potencjale jest zapewnienie wyższej precyzji i powtarzalności pomiarów, co jest kluczowe w systemach kontroli jakości w produkcji elektroniki, czy konserwacji dzieł sztuki, gdzie w świetle uv uwidacznane są np mikro uszkodzenia.</p>
+
+        <p>Warto również rozważyć zastosowania w fotolitografii i mikrofabrykacji, gdzie precyzyjne i jednolite naświetlanie podłoży jest niezbędne do uzyskania wysokiej rozdzielczości wzorów.</p>
+
+        <p>Wreszcie w analizie płytek z materiałem chemicznym i biologicznym pozwoli na bezpośredni pomiar intensywności danego obszaru, która jest jednakowa dla jednakowego stężenia analizowanej substancji w obrębie danej plamki, niezależnie w jakiej części płytki znajduje się ta plamka.</p>
+
       </div>
       <div id="segment4-pop" class="level-content">
-        <p>Podobne systemy mogą być używane w laboratoriach lub szkołach, gdzie potrzebne jest bardzo równe oświetlenie do dokładnej obserwacji próbek chemicznych.</p>
+       
+        <h1>Praktyczne zastosowanie</h1>
+
+        <p>Wyobraź sobie, że masz lampę, która świeci idealnie równo na całej powierzchni oświetlanej kartki, bez żadnych jaśniejszych punktów w środku czy ciemniejszych obszarów na brzegach. Nasza komora do fotografii to właśnie taka lampa, ale na zupełnie nowym poziomie precyzji, i to w niewidzialnym dla nas ultrafioletowym świetle.</p>
+      
+        <p>Dzięki temu, że światło naświetla obiekt tak jednolicie, można bez problemu robić jego super dokładne zdjęcia, które ujawniają ukryte detale. Co abstrachując od fotografii dla zastosowań w chromatografii czy analizie stężeń próbek biologicznych lub chemicznych może ułatwić pracę przy kontroli jakości produktów, np. sprawdzaniu matryc LCD, ponieważ nawet najmniejsza wada, która normalnie zostałaby przeoczona, teraz jest widoczna jak na dłoni. Aby aparaty cyfrowe mogły robić tak świetne zdjęcia należy je odpowiednio skalibrować, gdyż bez kalibracji do różnych obszarów matrycy światłoczułej dociera różna ilość światła, co jest spowodowane chociażby różnym kątem padania światła. gdyby nie kalibracja, każda kamera cyfrowa miałąby bardzo widocxną na obrazie winietę.</p>
+      
+        <p>To rozwiązanie otwiera też drzwi do konserwacji dzieł sztuki. Kiedy konserwatorzy oświetlają stare obrazy w UV, mogą zobaczyć niewidoczne gołym okiem uszkodzenia, wcześniejsze poprawki czy oryginalne podpisy. Ta technologia zapewnia, że oświetlenie jest perfekcyjnie jednolite, co pozwala na tworzenie bezbłędnych map uszkodzeń. Choć potencjalnie światło tu generowane jest bardzo rozproszone, co może zmniejszać kontrast pozwalający wykrywać uszkodzenia. Podobne zastosowanie dotyczy kontroli jakości w przemyśle dla płaskich przedmiotów, najlepiej przepuszczajacych światło uv.</p>
+
+        <p>Wreszcie jednym z najciekawszych zastosowań jest chromatografia cienkowarstwowa, technika używana do oddzielania różnych substancji. Kiedy oświetlasz płytkę UV, na której są te substancje, widać je jako plamy. Nasze oświetlenie sprawia, że każda plama zawierająca dokłądnie tyle samo substancji jest równie jasna, niezależnie od tego, gdzie się znajduje na płytce. Dzięki temu, zamiast używać skomplikowanych programów do "wyrównywania" jasności, można skupić się na tym, co najważniejsze: analizowaniu składu mieszaniny i ilości poszczególnych jej skłądników. To jakby robić zdjęcia idealnie oświetlonej sceny, zamiast bawić się w późniejsze poprawki w Photoshopie.</p>
+
       </div>
     </div>
   </section>
@@ -347,7 +381,8 @@
   <!-- Stopka -->
   <footer>
     <div class="container">
-      <p>Autor: Jan Kowalski | Licencja: CC BY-SA 4.0</p>
+      <p>Autor: Damian Bezara | Licencja: CC BY-SA 4.0</p>
+      <p>Współautorki: Maria Ważny, Agnieszka Ganczarz</p>
     </div>
   </footer>
 
