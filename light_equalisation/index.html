@@ -30,6 +30,44 @@
       font-size: 0.9rem;
       margin-bottom: 15px;
     }
+    h2 {
+        color: #555;
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 10px;
+        margin-top: 30px;
+    }
+    h3 {
+        color: #777;
+        margin-top: 20px;
+    }
+    p {
+        margin-bottom: 15px;
+        text-align: justify;
+    }
+    .image-container {
+        text-align: center;
+        margin: 20px 0;
+    }
+    .image-container img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .image-caption {
+        font-style: italic;
+        font-size: 0.9em;
+        color: #666;
+        margin-top: 5px;
+    }
+    iframe {
+        border: 1px solid #ccc;
+        width: 100%;
+        height: 600px;
+    }
+    ul, ol {
+        margin-bottom: 1em;
+    }
   </style>
 </head>
 <body>
@@ -84,23 +122,151 @@
         <button type="button" class="btn btn-success" onclick="showLevel('segment1','pop')">Popularno-naukowy</button>
       </div>
       <div id="segment1-tech" class="level-content">
-        <p>Badanie skupia się na utrzymaniu jednolitego oświetlenia płytki 10x10 cm HPTLC w zakresie UV-C. Optymalizacja światła pozwala na redukcję gradientu intensywności do 0.05%. Ten cel wynikał z wcześniejszych problemów w 6 iteracjach projektu aplikacji do analizy obrazu TLC. Początkowo próbowano kompensować nierównomierności oprogramowaniem, testując metody takie jak normalizacja przez dzielenie obrazu rozwiniętej płytki przez obraz czystej płytki (tło), lub wielokrotną iterację regresji wielomianowej 2D w celu wytworzenia jednolitego tła bez szumu średnio i drobnoziarnistego które wykorzystywano do subtrakcji od obrazu oryginalnego, a w kolejnych powtórzeniach do wyznaczania tła w regresji wykorzystywano tylko te piksele, które nie zostały w poprzednim etapie zakwalifikowane jako plamka. Te rozwiązania okazały się jednak niewystarczające z powodu podatności na artefakty i błędy wynikające z zajmowania dużej części tła przez smugi i plamki, co obniżało wiarygodność pomiarów.
+          <h1>Badanie równomierności oświetlenia HPTLC</h1>
 
-W odpowiedzi na te wyzwania, przyjęto podejście sprzętowe. Wykorzystano środowisko Blender do symulacji warunków oświetlenia o prametrach możliwie jak najbardziej zbliżonych do fizyki światła UVC z emiterów o parametrach zbliżonych do diod LED i cylindrycznych świetlówek. Na podstawie wyników symulacji zaprojektowano fizyczną komorę, którą wyłożono folią aluminiową. Niestety, drobne zagięcia folii generowały szum o średniej ziarnistości, trudniejszy do usunięcia niż standardowy szum drobnoziarnisty. Analiza symulacji i testów in vivo wykazała, że symulacje w środowisku blender są bardzo zbliżone do wyników in vivo, a studium literatury naukowej i forów fotograficznych pozwoliło sądzić, że folia teflonowa zapewnia znacznie bardziej gładkie odbicie światła uvc. Dzięki optymalizacji geometrycznej komory i uwzględnieniu parametrów materiału jej ścianek zbliżonych do właściwości optycznych folii teflonowej udało się osiągnąć w symulacji gradację intensywności oświetlenia mniejszą niż 0.05%, co oznacza, że różnica między najciemniejszym a najjaśniejszym obszarem płytki jest niewykrywalna dla kamery o głębi koloru do 11 bitów.</p>
+          <h3>Cel badawczy</h3>
+          <p>Celem badania było osiągnięcie jednolitego oświetlenia płytki HPTLC o wymiarach $10 \times 10$ cm w zakresie UV-C, z redukcją gradientu intensywności do poziomu poniżej 0,5%. Ostateczne osiągnięcie tego celu ma na celu zwiększenie wiarygodności i powtarzalności analiz obrazów TLC/HPTLC oraz umożliwi usunięcie złożonych metod programistycznych, które mają na celu kompensowanie nierównomierności oświetlenia.</p>
+
+          <h3>Ewolucja podejścia: Od oprogramowania do sprzętu</h3>
+          <p>Początkowo problem nierównomiernego oświetlenia próbowano rozwiązać na etapie przetwarzania obrazu. W toku sześciu iteracji budowania aplikacji do smartfonowej analizy obrazu TLC testowano różne metody, zarówno przedstawione w literaturze jak i własne pozwalające obliczyć zawartość substancji na podstawie obrazu plamki na TLC.</p>
+
+          <h3>Iteracje programistyczne:</h3>
+          <ol>
+              <li>
+                  <strong>Metoda subtrakcji obrazu czystej płytki:</strong>
+                  <p>Pierwsza próba polegała na odjęciu obrazu czystej płytki (stanowiącej tło) od obrazu płytki z rozdzielonymi substancjami.</p>
+                  <ul>
+                      <li><strong>Definicja:</strong> Obraz tła był uzyskiwany poprzez fotografowanie czystej, nie rozwiniętej płytki.</li>
+                      <li><strong>Problem:</strong> Metoda ta okazała się niewystarczająca, ponieważ wszelkie artefakty i szumy, które znajdowały się na obu obrazach (tła i rozwiniętej płytki), były duplikowane, a nie eliminowane. Dodatkowo, metoda była bardzo czasochłonna i wymagała idealnego, identycznego ułożenia obu płytek podczas fotografowania.</li>
+                  </ul>
+              </li>
+              <li>
+                  <strong>Metoda normalizacji przez dzielenie:</strong>
+                  <p>W kolejnej iteracji zastosowano normalizację, która polegała na dzieleniu obrazu rozwiniętej płytki przez obraz tła (czystej płytki).</p>
+                  <ul>
+                      <li><strong>Definicja:</strong> Obraz tła był ponownie obrazem czystej płytki.</li>
+                      <li><strong>Problem:</strong> Chociaż normalizacja zapewniała lepszą kompensację oświetlenia niż subtrakcja, była jeszcze bardziej podatna na nakładanie się artefaktów i szumów.</li>
+                  </ul>
+              </li>
+              <li>
+                  <strong>Regresja wielomianowa 2D (wstępna próba):</strong>
+                  <p>W celu eliminacji potrzeby używania obrazu czystej płytki, podjęto próbę generowania tła za pomocą regresji wielomianowej 2D. Tło było tworzone na podstawie analizy wszystkich pikseli obrazu.</p>
+                  <ul>
+                      <li><strong>Definicja:</strong> Algorytm regresji wielomianowej 2D analizował intensywność wszystkich pikseli obrazu, aby stworzyć matematyczny model tła.</li>
+                      <li><strong>Problem:</strong> Metoda ta była niestabilna i podatna na brak powtarzalności. Co więcej, jeśli plamki substancji pokrywały dużą powierzchnię płytki, ich intensywność zaburzała algorytm, prowadząc do błędnego wyznaczenia tła.</li>
+                  </ul>
+              </li>
+              <li>
+                  <strong>Regresja wielomianowa 2D (powtórzenie):</strong>
+                  <p>W celu poprawy metody 3, regresję zastosowano ponownie, ale tym razem piksele zidentyfikowane wstępnie jako plamki były wykluczone z obliczeń.</p>
+                  <ul>
+                      <li><strong>Definicja:</strong> Po pierwszej, wstępnej detekcji plamek, regresję 2D ponawiano, tym razem używając tylko pikseli z obszarów, które nie zostały zakwalifikowane jako plamki.</li>
+                      <li><strong>Problem:</strong> Metoda ta skutecznie poradziła sobie z problemem zanieczyszczania tła przez duże plamki. Jednakże, nadal była podatna na wpływ szumu średnioziarnistego, co negatywnie wpływało na wiarygodność pomiarów.</li>
+                  </ul>
+              </li>
+              <li>
+                  <strong>Regresja kwadratowa (pierwsza iteracja):</strong>
+                  <p>Aby przyspieszyć obliczenia, które były czasochłonne, zastąpiono regresję wielomianową regresją kwadratową, co pozwoliło na wykonanie obliczeń w około 1 sekundę na starszym sprzęcie.</p>
+              </li>
+              <li>
+                  <strong>Regresja kwadratowa (druga iteracja):</strong>
+                  <p>Następnym krokiem było udoskonalenie tej metody poprzez zastosowanie jej dwukrotnie. W pierwszej iteracji tło tworzono na podstawie całego obrazu. W drugiej iteracji natomiast, regresja była stosowana tylko w bezpośrednim otoczeniu wykrytych plamek.</p>
+                  <ul>
+                      <li><strong>Definicja:</strong> Algorytm analizował tylko lokalne sąsiedztwo plamki, aby wytworzyć tło.</li>
+                      <li><strong>Problem:</strong> Metoda ta poprawiła dokładność pomiarów w warunkach nierównomiernego lokalnie oświetlenia, zwłaszcza w przypadku występowania drobnych cieni i prześwietleń, które powstały w naszej konstrukcji komory wyłożonej folią aluminiową. Niestety, nadal nie była to metoda idealna, gdyż problem szumu średnioziarnistego został jedynie załagodzony.</li>
+                  </ul>
+              </li>
+              <li>
+                  <strong>Metoda z osłoną:</strong>
+                  <p>Jeszcze innym krokiem było użycie osłony pod i nad płytką, sprawiające, że jedynie 2 małe obszary płytki pozostają niezasłonięte - plamka i fragment czystego tła. Wówczas sumowano piksele dla obszaru plamki oraz dla czystego tła i odejmowano ich sumy. Ta metoda okazała się tą o największej powtarzalności i jednocześnie najbardziej czasochłonna, co wykluczało ją z dalszych badań, zwłaszcza, że została już opisana w literaturze.</p>
+              </li>
+          </ol>
+
+          <h3>Przejście do podejścia sprzętowego:</h3>
+          <p>Niewystarczająca skuteczność metod programowych, w szczególności ich podatność na szum średnioziarnisty i artefakty, doprowadziła do zmiany strategii na podejście sprzętowe. Zamiast korygować błędy oświetlenia w oprogramowaniu, podjęto wysiłek, aby je całkowicie wyeliminować na etapie robienia zdjęcia.</p>
+          <ul>
+              <li>
+                  <strong>Symulacje w Blenderze:</strong>
+                  <p>Wykorzystano środowisko Blender do symulacji warunków oświetlenia UV-C, modelując właściwości świetlówek i diod LED. Pozwoliło to na wirtualne testowanie różnych geometrii komór oraz materiałów. </p>
+              </li>
+              <li>
+                  <strong>Wady folii aluminiowej:</strong>
+                  <p>Na podstawie symulacji zaprojektowano i zbudowano fizyczną komorę wyłożoną folią aluminiową. Niestety, nawet drobne zagięcia folii generowały trudny do usunięcia szum o średniej ziarnistości.</p>
+              </li>
+              <li>
+                  <strong>Optymalizacja z folią teflonową:</strong>
+                  <p>Analiza symulacji i literatury wykazała, że folia teflonowa (PTFE) zapewnia znacznie lepsze, bardziej gładkie odbicie światła UV-C, co jest kluczowe do uniknięcia szumu o średniej ziarnistości - najtrudniejszego do cyfrowej eliminacji. Optymalizacja geometryczna komory w połączeniu z użyciem folii teflonowej pozwoliła w symulacjach osiągnąć gradację intensywności oświetlenia mniejszą niż 0,05% dając wynik 10-krotnie lepszy niż zamierzony. Oznacza to, że różnica między najjaśniejszym a najciemniejszym obszarem płytki staje się niewykrywalna dla potencjalnych kamer o głębi koloru do 11 bitów (zdjęcie w formacie png, czy najpopularniejszy w fotografii format jpg pozwalają na maksymalnie 8 bit głębię koloru, dla pojedynczego kanału, a format .HEIC stosowany w iPhone - na 10 bit głębię kolorów), co eliminuje potrzebę stosowania skomplikowanych metod kompensacji programowej.</p>
+              </li>
+          </ul>
+
+          <h3>Schemat budowy komory in vivo</h3>
+          <p>Poniżej znajduje się schemat budowy fizycznej komory do badania:</p>
+          <iframe src="https://farma.1ioe.top/light_equalisation/cel_tech/chambers.pdf"></iframe>
       </div>
       <div id="segment1-sci" class="level-content">
-        <p>Analiza obrazu płytek HPTLC wymaga do pomiarów ilościowych ekstremalnie jednolitego oświetlenia całej płytki, które próbuje się osiągnąć za pomocą cyfrowego wyrównywania.  Wczesne próby cyfrowej kompensacji, takie jak normalizacja obrazu przez dzielenie tło (zdjęcie czystej płytki HPTLC) lub przez odtworzone jednolite tło z użyciem regresji wielomianowej 2D, wykazały ograniczenia w zastosowaniach ilościowych. Pierwsza metoda jest podatna na błędy wynikające z artefaktów powstałych w trakcie rozwijania chromatogramu, a druga jest zawodna w przypadku próbek, które zajmują znaczną powierzchnię tła. Nawet iteracyjne podejście oparte na regresji wielomianowej przynosiło jedynie marginalną poprawę powtarzalności pomiarów (2-3%).
+        <h1>Badania nad optymalnym oświetleniem w HPTLC</h1>
 
-Dążenie do eliminacji błędów tła doprowadziło do nas zastosowania metod fizycznych. Zoptymalizowano komorę do fotografii, korzystając z symulacji w oprogramowaniu Blender, które z dużą dokładnością przewidywały zachowanie się światła UVC i jego interakcję z powierzchnią komory do fotografii. Symulacje poparte studium literatury naukowej wykazały, że optymalne rozproszenie światła można osiągnąć przy użyciu materiałów o wysokiej dyfuzyjności takie jak matowa folia aluminiowa lub folia teflonowa (PTFE), przy czym w komorze zastosowano tę pierwszą ze względu na większą dostępność. Jednak wyniki danych in vivo nie potwierdziły większej dokładności pomiarów zbudowanej przez nas  komory w kontraście do klasycznej konstrukcji, gdyż na uzyskanych obrazach pojawił się szum o trudnym do skorygowania charakterze. 
+        <p>Analiza obrazu płytek HPTLC, czyli wysokosprawnej chromatografii cienkowarstwowej, wymaga niezwykle równomiernego oświetlenia całej powierzchni płytki. Osiągnięcie tego jest kluczowe dla precyzyjnych pomiarów ilościowych. W przeszłości, starano się to uzyskać za pomocą cyfrowej kompensacji.</p>
+      
+        <h3>Wyzwania cyfrowej korekcji</h3>
 
-Aczkolwiek dalsza analiza danych i literatury wykazała, że symulacje mogą być cennym narzędziem do projektowania optymalnych systemów oświetleniowych do precyzyjnej analizy obrazu, a szum był wynikiem drobnych zagięć folii aluminiowej, więc pokrycie komory folią teflonową mogłoby istotnie poprawić uzyskane wyniki.
+        <p>Wczesne próby cyfrowego korygowania nierówności oświetlenia napotkały poważne ograniczenia. Jedną z metod była normalizacja obrazu poprzez odejmowanie go od tła lub dzielenie go przez tło, czyli obraz czystej płytki HPTLC.  Metoda ta jednak była podatna na błędy, ponieważ nawet niewielkie artefakty powstałe podczas przygotowywania chromatogramu mogły zaburzyć wyniki. Ponadto istniało ryzyko na łożenia się szumu i artefaktów z obrazu płytki czystej i rozwiniętej, prowadząc do duplikacji szumu.</p>
 
-Ostatecznie, obliczona w symulacji w blender w dla komory wyłożonej folią PTFE jednolitość oświetlenia jest na tyle wysoka, że obraz zarejestrowany 11-bitową kamerą nie wykazuje zauważalnych różnic w jasności na całej powierzchni płytki.  Różnica między najciemniejszym a najjaśniejszym obszarem wynosi tylko 0.05% i jest zauważalna dopiero przy 12-bitowej głębi koloru (0-2047) poziomów dla każdego z 3 kanałów koloru.</p>
+        <p>Innym podejściem eliminującym ryzyko duplikacji szumu była reprodukcja jednolitego tła za pomocą regresji wielomianowej 2D. W tej metodzie system komputerowy analizował rozkład jasności na obrazie i tworzył wirtualne, idealnie jednolite tło, które następnie odejmowano od obrazu oryginalnego. Niestety, była ona zawodna w przypadku próbek, które zajmowały dużą powierzchnię płytki, ponieważ system mylnie uznawał obszary plamek za część nierównomiernego oświetlenia tła.</p>
+
+        <p>Podejście to udoskonalinaliliśmy, wprowadzając <strong>iteracyjną regresję wielomianową</strong>. Po wstępnej subtrakcji tła, program wykrywał plamki, a następnie ponownie rekonstruował tło z wykluczeniem pikseli, które należały do uprzednio wykrytych plamek.  Choć przyniosło to pewną poprawę, powtarzalność pomiarów wzrosła jedynie marginalnie (o 2-3%), co nadal było niezadowalające.</p>
+
+        <h3>Poszukiwania fizycznych rozwiązań</h3>
+
+        <p>Dążenie do eliminacji błędów tła doprowadziło do skupienia się na metodach fizycznych. Zoptymalizowano konstrukcję komory do fotografii, korzystając z zaawansowanych symulacji w oprogramowaniu <strong>Blender</strong>, które z dużą dokładnością przewidywały, jak światło UVC będzie rozprzestrzeniać się w jej wnętrzu i oddziaływać z powierzchniami komory.</p>
+
+        <p>Symulacje wykazały, że optymalne rozproszenie światła można osiągnąć, używając materiałów o wysokiej dyfuzyjności, takich jak matowa folia aluminiowa lub folia teflonowa (PTFE). W zbudowanej komorze zastosowano folię aluminiową, ponieważ była łatwiej dostępna.</p>
+
+        <p>Jednak praktyczne testy nie potwierdziły wyższej dokładności pomiarów w porównaniu do klasycznych konstrukcji. Na obrazach pojawił się szum o trudnym do skorygowania charakterze, który pogorszył wyniki. Dalsza analiza wykazała, że szum był wynikiem drobnych zagięć folii aluminiowej. Okazało się, że choć folia aluminiowa jest dyfuzyjna, to jej nieregularna powierzchnia rozpraszała światło w sposób nieprzewidywalny. Analiza literatury fachowej pozwoliła przypuścić, że użycie folii teflonowej mogłoby znacząco poprawić wyniki.</p>
+
+        <h3>Ostateczne wnioski</h3>
+
+        <p>Ostatecznie, symulacje w Blenderze wykazały, że komora wyłożona folią PTFE zapewnia tak wysoką jednolitość oświetlenia, że obraz zarejestrowany 11-bitową kamerą nie wykazuje zauważalnych różnic w jasności. Różnica między najciemniejszym a najjaśniejszym obszarem wynosi zaledwie 0.05%. Jest ona na tyle niewielka, że staje się widoczna dopiero przy 12-bitowej głębi koloru, czyli 4096 poziomach jasności dla każdego z trzech kanałów koloru.</p>
+
+        <p>Podsumowując, chociaż początkowe próby fizyczne napotkały na problemy, symulacje w Blenderze okazały się nieocenionym narzędziem do projektowania precyzyjnych systemów oświetleniowych, co może w przyszłości istotnie poprawić dokładność i przyśpieszyć analizę obrazów chromatograficznych, pozwalając na analizę całej płytki TLC jednocześnie.</p>
+
       </div>
       <div id="segment1-pop" class="level-content">
-        <p>Celem tego badania było sprawienie, żeby obraz płytki HPTLC był równomiernie oświetlony, dzięki czemu kamera pokaże dokładny rozkład chemikaliów, bez potrzeby poprawiania obrazu komputerowo. Dla niezaznajomionych, HPTLC to metoda chemiczna, w której rozdziela się różne substancje od siebie, a dokonuje się to na specjalnej płytce, którą potem można sfotografować i przeanalizować przez odpowiednie  oprogramowanie. Aby jednak wykonać zdjęcia należy ośwetlić płytkę za pomocą światła UV - dopiero wówczas na płytce uwidaczniają się plamki - a każda z nich to inna substancja. Wcześniej, próbowaliśmy naprawiać zdjęcia za pomocą sprytnych sztuczek komputerowych. Na przykład, chcieliśmy, aby program dzielił każdy piksel zdjęcia takiej płytki, przez liczbę - która wskazywała jaka powinna byś jasność tego konkretnego piksela, gdyby nie było w tym miejscu żadnej plamki, ale to było trudne, bo często chemikalia rozlewały się po całej płytce, myląc program i dając nam niedokładne wyniki. Odkryliśmy, że najlepszą metodą na uzyskanie dokładnych wyników nie jest próba naprawiania złego zdjęcia, ale zrobienie od początku idealnego zdjęcia!
+          <h1>Badania nad optymalnym oświetleniem w HPTLC</h1>
 
-W tym celu, stworzyliśmy wirtualną makietę specjalnej komory do fotografii tych płytek, używając programu do animacji 3D o nazwie Blender.  W tej wirtualnej komorze mogliśmy sprawdzić, jak światło rozchodzi się od żarówek UVC i jak najlepiej oświetlić płytkę, unikając cieni. Następnie, na podstawie symulacji, zbudowaliśmy taką komorę z lekkiego styropianu. Na początku wyłożyliśmy ją folią aluminiową, ale okazało się, że jej zagięcia tworzyły brzydkie cienie. Wymieniliśmy więc folię aluminiową na teflonową, która według literatury naukowej nadaje się najlepiej do idealnego rozpraszania światła i przygotowaliśmy symulacje w programie blender. Dzięki temu, uzyskany obraz jest tak równo oświetlony, że nawet całkiem precyzyjna kamera ma problem z odróżnieniem jaśniejszych i ciemniejszych miejsc na zdjęciu czystej płytki przed nałożeniem na nią jakichkolwiek substancji. Słowem końcowym, w idealnych warunkach na czystej płytce każde miejsce należące do tła - czyli takie gdzie nie ma żadnych plamek, powinno mieć na zdjęciu dokładnie taki sam kolor, ale tak się nie dzieje, z wielu powodów - np. dlatego, że sama budowa kamery powoduje już pewne nierównomierności. Jednak tym najbardziej istotnym elementem jest oświetlenie płytki, gdzie w tradycyjnych komorach do fotografii, część płytki bliższa świetlówce jest mocniej oświetlona od tej dalszej. </p>
+              <p>Celem naszych badań było rozwiązanie pewnego problemu, który trapi analityków pracujących z <strong>chromatografią cienkowarstwową wysokiej sprawności (HPTLC)</strong>. To długa nazwa, ale w skrócie chodzi o to, że HPTLC to metoda chemiczna, która pozwala na rozdzielenie substancji na specjalnej płytce. Po rozdzieleniu substancje te tworzą małe plamki, a każda z nich to inna substancja. Problem w tym, że te plamki są często niewidoczne, dlatego musimy je "oświetlić" światłem <strong>UV</strong>. Dopiero wtedy możemy je sfotografować i przeanalizować za pomocą specjalnego oprogramowania, które mówi nam, co znajduje się w próbce.</p>
+
+              <div class="image-container">
+                  <img src="https://farma.1ioe.top/light_equalisation/cel_pop/hptlc.jpg">
+                  <div class="image-caption">Przykładowa płytka TLC z naniesionymi substancjami.</div>
+              </div>
+
+              <h3>Walka z nierównomiernym oświetleniem</h3>
+
+              <p>Przez długi czas próbowaliśmy "oszukać" naturę, poprawiając zdjęcia komputerowo. Nasz plan był taki: stworzyć cyfrową mapę jasności czystej płytki, a następnie podzielić przez nią zdjęcie z plamkami. W ten sposób mieliśmy nadzieję zniwelować nierówności w oświetleniu. Jednak szybko okazało się, że to nie działa. Często substancje rozlewały się pomiędzy plamkami tworząc na płytce smugi i myląc program, co dawało nam niedokładne wyniki. W końcu zrozumieliśmy, że najlepszym rozwiązaniem nie jest naprawianie złego zdjęcia, ale zrobienie od razu idealnego. Zamiast walczyć z nierównomiernym oświetleniem, smugami, zanieczyszczeniami i uszkodzeniami powierzchni płytek, postanowiliśmy stworzyć warunki, w których nierównomierność oświetlenia w ogóle nie powstanie!</p>
+
+              <h3>Komora do fotografii</h3>
+
+              <p>Aby to osiągnąć, zaczęliśmy od wirtualnego świata. Wykorzystaliśmy program do animacji 3D o nazwie <strong>Blender</strong> do stworzenia wirtualnej komory fotograficznej. W tej cyfrowej przestrzeni mogliśmy dokładnie symulować, jak rozchodzi się światło od lamp UV i jak najlepiej oświetlić płytkę, aby uniknąć cieni.</p>
+
+              <div class="image-container">
+                  <img src="https://farma.1ioe.top/light_equalisation/cel_pop/sim.jpg">
+                  <div class="image-caption">Model 3D naszej komory do fotografii płytek.</div>
+              </div>
+              
+              <p>Po udanych symulacjach przyszedł czas na budowę realnej komory. Wykonaliśmy ją z lekkiego styropianu, a następnie wyłożyliśmy ją... folią aluminiową. Niestety, okazało się, że fałdy i zagięcia folii tworzą brzydkie cienie, które rujnują efekt, na którym nam zależało. Nie poddaliśmy się! Zastąpiliśmy folię aluminiową teflonową, która, jak podaje literatura naukowa, idealnie rozprasza światło i rozpoczęliśmy szereg symulacji komputerowych. Wynik przeszedł nasze najśmielsze oczekiwania. Uzyskane zdjęcia są tak równomiernie oświetlone, że nawet czułe kamery mają problem z wykryciem różnicy w jasności na zdjęciu czystej płytki.</p>
+
+              <div class="image-container">
+                  <img src="https://farma.1ioe.top/light_equalisation/cel_pop/chamber.jpg">
+                  <div class="image-caption">Komora in vivo do fotografii płytek pokryta folią aluminiową.</div>
+              </div>
+
+              <p>Podsumowując, w idealnym świecie tło na zdjęciu powinno być idealnie jednolite. Niestety, z powodu niedoskonałości sprzętu fotograficznego i, co najważniejsze, nierównomiernego oświetlenia, tak nie jest. W tradycyjnych komorach do fotografii płytka HPTLC jest mocniej oświetlona w miejscu bliższym lampie. Nasze rozwiązanie eliminuje ten problem, a to otwiera drogę do dokładniejszych i szybszych analiz, bez potrzeby skomplikowanej obróbki cyfrowej.</p>
+
+              <div class="image-container">
+                  <img src="https://farma.1ioe.top/light_equalisation/cel_pop/chart.jpg">
+                  <div class="image-caption">Wykres pokazujący przekrój przez płytkę skośnie.</div>
+              </div>      
       </div>
     </div>
   </section>
