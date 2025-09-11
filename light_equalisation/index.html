@@ -390,13 +390,47 @@ W świetle tych ustaleń oraz dalszej analizy literatury, która wskazała na fo
         <button type="button" class="btn btn-success" onclick="showLevel('segment3','pop')">Popularno-naukowy</button>
       </div>
       <div id="segment3-tech" class="level-content">
-        <p>Różnica w intensywności między najciemniejszym a najjaśniejszym punktem <strong>0.05%</strong>. Dane uzyskane dla płytki 10x10 cm z kamerą 13-bitową.</p>
+
+        <h1>Wyniki i analiza danych</h1>
+
+        <p>Na podstawie przeprowadzonych symulacji uzyskano następujące wyniki dotyczące jednolitości oświetlenia (wyrażone jako maksymalna różnica jasności między najjaśniejszym a najciemniejszym punktem, w stosunku do jasności maksymalnej):</p>
+
+        <p>Dla komory wyłożonej czarną farbą lateksową najlepszy wynik wyniósł <strong>0,146%</strong>.</p>
+
+        <p>Dla komory z wyściółką z folii PTFE najlepszy wynik wyniósł<strong>0,043%</strong>.</p>
+
+        <p>Wyniki te wskazują, że zastosowanie folii PTFE poprawia jednolitość oświetlenia o współczynnik 3,4 w porównaniu do czarnej komory.
+Mając na uwadze, że minimalna wykrywalna różnica jasności dla kamery z 9-bitową głębią koloru wynosi 0,195%, a dla kamery 11-bitowej 0,048%, uzyskane rezultaty potwierdzają, że w optymalnych warunkach obie konfiguracje komory są wystarczające do uzyskania jednolitości oświetlenia nieodróżnialnej dla kamer smartfonów o głębi koloru 8 bit.</p>
+
+        <p>Wyniki te wskazują, że zastosowanie folii PTFE poprawia jednolitość oświetlenia o współczynnik 3,4 w porównaniu do czarnej komory.
+Mając na uwadze, że minimalna wykrywalna różnica jasności dla kamery z 9-bitową głębią koloru wynosi 0,195%, a dla kamery 11-bitowej 0,048%, uzyskane rezultaty potwierdzają, że w optymalnych warunkach obie konfiguracje komory są wystarczające do uzyskania jednolitości oświetlenia nieodróżnialnej dla kamer smartfonów o głębi koloru 8 bit.</p>
+
       </div>
       <div id="segment3-sci" class="level-content">
-        <p>Symulacje i eksperymenty potwierdzają, że fizyczne utrzymanie jednolitego oświetlenia minimalizuje potrzebę cyfrowego wyrównywania obrazu, co zwiększa wiarygodność analizy HPTLC.</p>
+
+        <h1>Wyniki</h1>
+
+        <p>W wyniku przeprowadzonych symulacji, uzyskano następujące wartości minimalnej różnicy luminancji, wyrażonej jako procent luminancji maksymalnej: dla komory wyłożonej czarną farbą lateksową minimalny odnotowany współczynnik jednolitości oświetlenia wyniósł 0,146%, natomiast dla komory z wyściółką z folii PTFE 0,043%.</p>
+
+        <p>Uzyskane wyniki wskazują na 3,4-krotne zwiększenie jednolitości oświetlenia w przypadku zastosowania wyściółki PTFE. W kontekście technicznych parametrów akwizycji obrazu, uzyskane wartości są niższe niż progi detekcji odpowiednio dla potencjalnych matryc o głębi koloru 9 bit (0,195%) i 11 bit (0,048%). Potwierdza to skuteczność zaproponowanego rozwiązania, zapewniając, że w idealnych warunkach obraz czystej płytki będzie miał jednolitą jasność z perspektywy sensorów mobilnych (głębia koloru ≥ 8 bit), co rozwiązuje pierwotny problem segmentacji plamek.</p>
+
+        <p>Dodatkowo, analiza map oświetlenia ujawniła, że w przypadku komory z PTFE rozkład luminancji przyjmuje formę zbliżoną do odwrotności winietowania, co może być wykorzystane do kompensacji tego efektu wbudowanego w układy optyczne. Z kolei dla komory z czarną wyściółką, rozkład luminancji przyjmuje postać podwójnej sinusoidy, która nie daje tak korzystnego efektu.</p>
+
       </div>
       <div id="segment3-pop" class="level-content">
-        <p>Nasze ustawienia światła działają tak dobrze, że obraz płytki jest praktycznie idealny, bez konieczności komputerowego poprawiania jasności.</p>
+
+        <h1>Nasze wyniki</h1>
+
+        <h3>Oto najważniejsze wnioski z naszych symulacji:</h3>
+
+        <p>W przypadku komory wyłożonej czarnym materiałem, udało nam się zminimalizować różnicę między najjaśniejszym a najciemniejszym punktem do <strong>0,146%.</strong></p>
+
+        <p>Dla komory wyłożonej folią PTFE, ten wynik był znacznie lepszy i wyniósł <strong>0,043%</strong>. Oznacza to, że folia teflonowa sprawdziła się <strong>3.4</strong> razy lepiej niż materiał czarny.</p>
+
+        <p>Te liczby są bardzo ważne, ponieważ potencjalny aparat z 9-bitową głębią koloru jest w stanie rozróżnić różnicę na poziomie 0,195%, a kamera z 11-bitową matrycą aż 0,048%. Oznacza to, że w idealnych warunkach, zarówno przy użyciu komory z czarnym materiałem, jak i z folią PTFE, nasze rozwiązanie sprawi, że dla oka przeciętnej kamery (8 z bitową głębią - 0,39%) każdy fragment czystej płytki będzie miał taką samą jasność.</p>
+
+        <p>Co ciekawe, dla komory z PTFE mapa oświetlenia przyjmuje kształt zbliżony do odwrotności winietowania, co może paradoksalnie korygować ten efekt wbudowany w aparaty. Z kolei w przypadku komory z czarnym materiałem, oświetlenie przypomina podwójną sinusoidę, która nie daje już tak korzystnego efektu.</p>
+
       </div>
     </div>
   </section>
