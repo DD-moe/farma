@@ -285,13 +285,94 @@
         <button type="button" class="btn btn-success" onclick="showLevel('segment2','pop')">Popularno-naukowy</button>
       </div>
       <div id="segment2-tech" class="level-content">
-        <p>Użycie dyfuzorów i źródeł światła LED o wysokiej stabilności spektralnej. Pozycjonowanie kamer z precyzyjnym kalibratorem światła.</p>
+
+        <h1>Metodologia badawcza</h1>
+
+        <h2>Skrót metodologii poprzednich badań</h2>
+
+        <h3>Etap I: Iteracyjny rozwój aplikacji do analizy obrazu płytek TLC</h3>
+
+        <p>Cykl badań rozpoczęto od szczegółowej analizy literatury naukowej, koncentrującej się na technikach pre- i post-processingu obrazów cyfrowych w chromatografii cienkowarstwowej. Na podstawie tej analizy zaprojektowano i zaimplementowano aplikację webową (sześć wersji prototypowych) do ilościowej i jakościowej analizy płytek HPTLC/TLC. W trakcie tego etapu zidentyfikowano kluczowe wyzwania, z których najbardziej problematycznym okazało się niejednolite oświetlenie płytki, utrudniające segmentację plamek.</p>
+
+        <h3>Etap II: Symulacje komputerowe i optymalizacja geometrii komory</h3>
+
+        <p>W celu rozwiązania problemu nierównomiernego oświetlenia wykorzystano Blender 4.5, oprogramowanie do modelowania 3D i symulacji optycznych. Stworzono wirtualny model dwuczęściowej komory fotograficznej, wyposażonej w pojedyncze liniowe źródło światła oświetlające w sposób rozproszony dolną część komory. Symulacje przeprowadzono dla obrazów o wymiarach 4×128 pikseli, z 16-bitową głębią koloru, w trybie monochromatycznym. Zróżnicowano liczbę próbek (samples) w renderowaniu, dokumentując je w nazwie pliku (100×10 
+3
+ , 400×10 
+3
+ , 10 
+6
+ , 4×10 
+6
+ ), odpowiednio jako sufiksy nazw ( ““, “m”, “u”, “i”). Wstępne symulacje, weryfikowane z testami in vivo na fizycznym prototypie komory, ujawniły, że mimo dużej wierności modelu wirtualnego, wyniki były gorsze od tych uzyskanych przy użyciu klasycznej komory z algorytmem subtrakcji tła.</p>
+
+          <h3>Etap III: Ulepszona rekonstrukcja tła</h3>
+
+          <p>W odpowiedzi na te obserwacje, wprowadzono udoskonalony algorytm rekonstrukcji tła, bazujący na dwuwymiarowej regresji kwadratowej (2D quadratic regression). Tło, zrekonstruowane z całego obrazu, zostało odjęte od oryginalnej akwizycji w celu wstępnej segmentacji plamek. Następnie, w drugim etapie, rekonstrukcję tła powtórzono, ale wyłącznie w obszarze bliskim wykrytym plamkom i tylko bazując na jasności pikseli nienależących do plamek wykrytych w poprzednim etapie. Pozwoliło to na skuteczną ale nie pełną eliminację szumu średnioziarnistego spowodowanego nierównościami powierzchni komory wynikającymi z drobnych zagięć folii aluminiowej.</p>
+
+          <h2>Metodologia obecnego badania</h2>
+
+          <p>W oparciu o dalszą literaturową analizę, wywnioskowano, że folia teflonowa (PTFE), charakteryzująca się albedo dla UVC równym 0.93 i większą odpornością na zagniecenia, może stanowić lepsze rozwiązanie niż wcześniej używana folia aluminiowa. Zrezygnowano z dalszych testów in vivo, koncentrując się wyłącznie na symulacjach, w celu znalezienia modelu, w którym oświetlenie byłoby na tyle jednolite, aby różnice w jasności nie były możliwe do odróżnienia na 8-bitowej głębi koloru.</p>
+
+          <p>Symulacje w Blenderze kontynuowano, analizując wpływ różnych konfiguracji oświetlenia (według poniższego schematu) oraz materiałów wyściółki komory (PTFE vs. czarna farba lateksowa).  Monochromatyczne obrazy (16-bitowe TIFF) były następnie przetwarzane w ImageJ ("Fiji"): zmniejszano ich rozmiar do 1×128 pikseli i zwiększano głębię koloru do 32 bitów. Jako kryterium optymalizacji wykorzystano współczynnik jednolitości oświetlenia (różnica między maksymalną a minimalną jasnością, podzielona przez jasność maksymalną), dążąc do jego minimalizacji poprzez wirtualne przesuwanie źródeł światła w osiach x i z. </p>
+
       </div>
       <div id="segment2-sci" class="level-content">
-        <p>Metoda opiera się na symulacji rozkładu światła oraz eksperymentalnym ustawieniu źródeł LED. Celem jest osiągnięcie rozkładu jednolitego w granicach 0.05%, odzwierciedlając warunki laboratoryjne przy niskobudżetowej konstrukcji.</p>
+
+        <h1>Metodologia badawcza</h1>
+
+        <p>Niniejsze badanie wykorzystuje zintegrowane podejście, łączące cyfrową analizę obrazu, zaawansowane techniki symulacji optycznych oraz modelowanie matematyczne. Celem jest opracowanie i optymalizacja nowej metody akwizycji i analizy obrazów z płytek HPTLC/TLC, eliminującej błędy wynikające z nierównomiernego oświetlenia.</p>
+
+        <h2>Skrót metodologii poprzednich badań z niniejszego cyklu</h2>
+
+        <h3>Faza 1: Analiza i Prototypowanie</h3>
+
+        <p>Badanie rozpoczęło się od systematycznego przeglądu literatury, w celu identyfikacji dotychczas stosowanych metod cyfrowej analizy chromatogramów, ze szczególnym uwzględnieniem algorytmów pre-processingu (korekcji oświetlenia, normalizacji) i segmentacji plamek. Na tej podstawie zaprojektowano i wdrożono sześć iteracyjnych wersji aplikacji webowej przeznaczonej do analizy ilościowej i jakościowej z wykorzystaniem smartfonów. Proces ten ujawnił, że kluczowym wyzwaniem jest kompensacja nierównomiernego oświetlenia, które zakłóca proces segmentacji.</p>
+
+        <h3>Faza 2: Modelowanie i weryfikacja</h3>
+
+        <p>Aby rozwiązać problem nierównomiernego oświetlenia, zastosowano podejście oparte na symulacjach komputerowych. Wykorzystano oprogramowanie Blender 4.5 do stworzenia wirtualnego modelu dwuczęściowej komory fotograficznej. Model ten, oświetlany pojedynczą świetlówką, posiadał dyfuzyjnie odbijającą powierzchnię w dolnej części, co miało na celu równomierne rozproszenie światła.  Symulacje pozwoliły zoptymalizować geometrię takiej komory, na bazie której zbudowano jej odpowiednik in vivo, który pokryto folią aluminiową. Kolejno porównano wyniki symulacji porównano z tymi uzyskanymi na skonstruowanym fizycznym prototypie komory. Wyniki testów in vivo wykazały, że mimo wysokiej korelacji z symulacjami i lepszej jednolitości globalnego oświetlenia, zastosowanie prostej subtrakcji tła w klasycznej komorze dawało lepsze rezultaty. Powodem tego był szum o średniej ziarnistości wynikający z drobnych zagięć folii aluminiowej, na który nie były odporne klasycznie stosowane algorytmy preprocesingu.</p>
+
+        <h3>Faza 3: Opracowanie udoskonalonego algorytmu i optymalizacja wirtualna</h3>
+
+        <p>W celu poprawy efektywności, opracowano nowatorski algorytm korekcji tła, oparty na dwuwymiarowej regresji kwadratowej. W pierwszym kroku, zrekonstruowane tło, obliczone dla całego obrazu, było odejmowane od obrazu pierwotnego, co pozwalało na wstępną segmentację plamek. W drugim kroku, tło było rekonstruowane ponownie, tym razem na podstawie tylko tych pikseli, które nie należały do plamek i znajdowały się w ich bezpośrednim sąsiedztwie. Ten dwuetapowy proces pozwolił na eliminację znacznej części wpływu szumu średnioziarnistego, generowanego przez niewielkie zagięcia i nierówności folii wyścielającej komorę.
+W świetle tych ustaleń oraz dalszej analizy literatury, która wskazała na folię PTFE jako materiał o lepszych właściwościach optycznych (albedo dla UVC = 0.93) i mechanicznych (mniejsza podatność na zagięcia), podjęto decyzję o kontynuowaniu badań wyłącznie w środowisku wirtualnym - ze względu za cenę folii teflonowej, czasochłonność konstrukcji komory in vivi i prognozowanej konieczności częstych zmian geometrii komory.</p>
+
+          <h2>Obecne badanie</h2>
+
+          <h3>Faza 4: Wirtualna optymalizacja parametrów</h3>
+
+          <p>Głównym celem tej fazy było znalezienie optymalnej geometrii komory i konfiguracji oświetlenia, która zapewniłaby jednolite oświetlenie w stopniu niemożliwym do rozróżnienia na 8-bitowej skali szarości. Symulacje prowadzono dla różnych konfiguracji źródeł światła (np. dwie świetlówki naprzeciwlegle) oraz materiałów wyścielających komorę (PTFE vs. farba lateksowa). Obrazy (16-bitowe, monochromatyczne TIFF) były poddawane dalszej obróbce (zmniejszenie rozmiaru do 1x128 px i zmiana głębi koloru na 32 bit)  w programie ImageJ ("Fiji") w celu normalizacji i uśrednienia sygnału. Jako metrykę optymalizacyjną wykorzystano stosunek różnicy maksymalnej i minimalnej jasności do jasności maksymalnej, minimalizując go poprzez wirtualne przesuwanie świetlówek w osiach x i z.</p>
+
       </div>
       <div id="segment2-pop" class="level-content">
-        <p>Rozkład światła na płytce jest kontrolowany przez specjalne lampy i „filtry”, żeby każdy fragment płytki był oświetlony jednakowo.</p>
+      
+        <h1>Metodologia naszego badania</h1>
+
+        <p>Wyobraź sobie, że fotografujesz płytkę chromatograficzną smartfonem. Często zdjęcie jest za jasne w jednym miejscu, a za ciemne w innym. To ogromny problem, który utrudnia precyzyjną analizę, na przykład wykrycie plamek i zmierzenie ich wielkości. Nasze badanie ma na celu stworzenie idealnej "komory" do robienia takich zdjęć, która zapewni perfekcyjnie jednolite oświetlenie.</p>
+
+        <h2>Jak to zrobiliśmy?</h2>
+
+        <h3>Od literatury do aplikacji: </h3>
+
+        <p>Zaczęliśmy od dokładnego przeszukania książek i artykułów naukowych, żeby dowiedzieć się, jak inni badacze radzili sobie z tym problemem. Na tej podstawie stworzyliśmy sześć wersji naszej aplikacji do analizy zdjęć z płytek. Szybko jednak okazało się, że główną przeszkodą jest nrjednakowe oświetlenie płytek, czyli to, że do jedna jej część jest jaśniejsza na zdjęciu od drugiej.</p>
+
+        <h3>Symulacje na komputerze</h3>
+
+        <p>Zamiast budować dziesiątki różnych prototypów, postanowiliśmy wykorzystać profesjonalny program Blender do symulacji. Stworzyliśmy wirtualną komorę fotograficzną z pojedynczą świetlówką i odbijającą światło powierzchnią. Następnie dla najlepszego modelu komory zbudowaliśmy jej fizyczny prototyp i wyłożyliśmy jej ścianki folią aluminiową - odbijającą światło uv. Nasze wirtualne testy pokazały, że symulacje są bardzo bliskie rzeczywistości, ale... wyniki wciąż były gorsze niż te uzyskane w prostej, fizycznej komorze. To był ważny moment – uświadomiliśmy sobie, że kluczem jest nie tylko sama komora, ale i algorytm do obróbki zdjęć.</p>
+
+        <h3>Inteligentny algorytm:</h3>
+
+        <p> Opracowaliśmy więc nowy, dwuetapowy algorytm. Działa on jakby w dwóch krokach:</p>
+
+        <p><strong>Krok 1:</strong> Najpierw program "przewiduje" tło obrazu i odejmuje je od całego zdjęcia. Dzięki temu jest w stanie wstępnie znaleźć plamki.</p>
+
+        <p><strong>Krok 2</strong>: Następnie, w drugim, precyzyjnym kroku, program jeszcze raz "przewiduje" tło i odejmuje je od obrazu, ale tylko w bliskim sąsiedztwie znalezionych plamek. To pozwala poradzić sobie z drobnymi szumami, które na zdjęciu wyglądają jak małe, niechciane plamki, a tak naprawdę są efektem np. zagięć na materiale, którym wyłożona jest komora.</p>
+
+        <h3>Wirtualne laboratorium:</h3>
+
+        <p>Zauważyliśmy, że drogi, ale idealny materiał o nazwie folia teflonowa (PTFE), lepiej odbija światło niż tańsza folia aluminiowa, której używaliśmy wcześniej. Dzięki temu, że nasze symulacje były tak wierne, zrezygnowaliśmy z budowy kolejnych fizycznych prototypów. W pełni przenieśliśmy nasze laboratorium do wirtualnego świata Blender, aby znaleźć idealną konfigurację! Naszym celem było stworzenie takiego oświetlenia, które byłoby tak równe, że nawet 8-bitowa kamera w telefonie nie byłaby w stanie wykryć różnic w jasności. Sprawdzaliśmy różne ustawienia lamp, a także porównywaliśmy różne materiały wyściełające komorę, by znaleźć idealne rozwiązanie. To pozwoliło nam na przeprowadzenie setek testów w ułamku czasu, który zajęłoby to w prawdziwym świecie.</p>
+
       </div>
     </div>
   </section>
