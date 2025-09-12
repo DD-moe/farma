@@ -68,6 +68,19 @@
     ul, ol {
         margin-bottom: 1em;
     }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #000;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
   </style>
 </head>
 <body>
@@ -441,6 +454,289 @@ Mając na uwadze, że minimalna wykrywalna różnica jasności dla kamery z 9-bi
         <h1>Wyniki</h1>
 
         <p>W wyniku przeprowadzonych symulacji, uzyskano następujące wartości minimalnej różnicy luminancji, wyrażonej jako procent luminancji maksymalnej: dla komory wyłożonej czarną farbą lateksową minimalny odnotowany współczynnik jednolitości oświetlenia wyniósł 0,146%, natomiast dla komory z wyściółką z folii PTFE 0,043%.</p>
+
+        <h3>Różnica między najjaśniejszymi a najciemniejszymi obszarami obrazu płytki dla komory pokrytej czarną farbą</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th colspan="5" style="text-align: center;">black</th>
+                </tr>
+                <tr>
+                  <th>1 probe name</th>
+                  <th>min value</th>
+                  <th>2 probe name</th>
+                  <th>max value</th>
+                  <th>difference index (%)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>k0</td>
+                  <td>29178</td>
+                  <td>k0</td>
+                  <td>30074</td>
+                  <td>2,979317683</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>1</td>
+                  <td></td>
+                  <td>1</td>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>1</td>
+                  <td></td>
+                  <td>1</td>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>1</td>
+                  <td></td>
+                  <td>1</td>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>1</td>
+                  <td></td>
+                  <td>1</td>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>1</td>
+                  <td></td>
+                  <td>1</td>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>1</td>
+                  <td></td>
+                  <td>1</td>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>1</td>
+                  <td></td>
+                  <td>1</td>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <td>k14</td>
+                  <td>66446</td>
+                  <td>k15</td>
+                  <td>68262</td>
+                  <td>2,660338109</td>
+                </tr>
+                <tr>
+                  <td>k16</td>
+                  <td>72027</td>
+                  <td>k17</td>
+                  <td>74025</td>
+                  <td>2,699088146</td>
+                </tr>
+                <tr>
+                  <td>k18</td>
+                  <td>74888</td>
+                  <td>k19</td>
+                  <td>76620</td>
+                  <td>2,260506395</td>
+                </tr>
+                <tr>
+                  <td>k20</td>
+                  <td>69615</td>
+                  <td>k21</td>
+                  <td>69717</td>
+                  <td>0,146305779</td>
+                </tr>
+                <tr>
+                  <td>k22</td>
+                  <td>73956</td>
+                  <td>k23</td>
+                  <td>75910</td>
+                  <td>2,574100909</td>
+                </tr>
+                <tr>
+                  <td>k24</td>
+                  <td>74479</td>
+                  <td>k25</td>
+                  <td>76373</td>
+                  <td>2,479934008</td>
+                </tr>
+                <tr>
+                  <td>k26</td>
+                  <td>74810</td>
+                  <td>k27</td>
+                  <td>76607</td>
+                  <td>2,34573864</td>
+                </tr>
+                <tr>
+                  <td>k28</td>
+                  <td>74675</td>
+                  <td>k29</td>
+                  <td>76518</td>
+                  <td>2,408583601</td>
+                </tr>
+              </tbody>
+            </table>        
+
+            <h3>Różnica między najjaśniejszymi a najciemniejszymi obszarami obrazu płytki dla komory pokrytej folią PTFE</h3>
+
+                <table>
+                  <thead>
+                    <tr>
+                      <th colspan="5" style="text-align: center;">PTFE</th>
+                    </tr>
+                    <tr>
+                      <th>1 probe name</th>
+                      <th>min value</th>
+                      <th>2 probe name</th>
+                      <th>max value</th>
+                      <th>difference index (%)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>k0</td>
+                      <td>46533</td>
+                      <td>k0</td>
+                      <td>47082</td>
+                      <td>1,16605072</td>
+                    </tr>
+                    <tr>
+                      <td>k1</td>
+                      <td>89698</td>
+                      <td>k2</td>
+                      <td>90371</td>
+                      <td>0,744707926</td>
+                    </tr>
+                    <tr>
+                      <td>k3</td>
+                      <td>91962</td>
+                      <td>k4</td>
+                      <td>92662</td>
+                      <td>0,755433727</td>
+                    </tr>
+                    <tr>
+                      <td>k5</td>
+                      <td>92919</td>
+                      <td>k6</td>
+                      <td>93688</td>
+                      <td>0,820809495</td>
+                    </tr>
+                    <tr>
+                      <td>k7</td>
+                      <td>46540</td>
+                      <td>k7</td>
+                      <td>47078</td>
+                      <td>1,142784315</td>
+                    </tr>
+                    <tr>
+                      <td>k8</td>
+                      <td>89666</td>
+                      <td>k9</td>
+                      <td>90362</td>
+                      <td>0,770235276</td>
+                    </tr>
+                    <tr>
+                      <td>k10</td>
+                      <td>91942</td>
+                      <td>k11</td>
+                      <td>92639</td>
+                      <td>0,752382906</td>
+                    </tr>
+                    <tr>
+                      <td>k12</td>
+                      <td>92916</td>
+                      <td>k13</td>
+                      <td>93690</td>
+                      <td>0,826128722</td>
+                    </tr>
+                    <tr>
+                      <td>k14</td>
+                      <td>102984</td>
+                      <td>k15</td>
+                      <td>103498</td>
+                      <td>0,496627954</td>
+                    </tr>
+                    <tr>
+                      <td>k16</td>
+                      <td>104482</td>
+                      <td>k17</td>
+                      <td>104792</td>
+                      <td>0,295824109</td>
+                    </tr>
+                    <tr>
+                      <td>k18</td>
+                      <td>105033</td>
+                      <td>k19</td>
+                      <td>105200</td>
+                      <td>0,158745247</td>
+                    </tr>
+                    <tr>
+                      <td>k20</td>
+                      <td>102727</td>
+                      <td>k21</td>
+                      <td>103694</td>
+                      <td>0,932551546</td>
+                    </tr>
+                    <tr>
+                      <td>k22</td>
+                      <td>104960</td>
+                      <td>k23</td>
+                      <td>105135</td>
+                      <td>0,166452656</td>
+                    </tr>
+                    <tr>
+                      <td>k24</td>
+                      <td>105074</td>
+                      <td>k25</td>
+                      <td>105192</td>
+                      <td>0,112175831</td>
+                    </tr>
+                    <tr>
+                      <td>k26</td>
+                      <td>105079</td>
+                      <td>k27</td>
+                      <td>105203</td>
+                      <td>0,117867361</td>
+                    </tr>
+                    <tr>
+                      <td>k28</td>
+                      <td>105101</td>
+                      <td>k29</td>
+                      <td>105211</td>
+                      <td>0,104551805</td>
+                    </tr>
+                    <tr>
+                      <td>k28m</td>
+                      <td>105062</td>
+                      <td>k29m</td>
+                      <td>105219</td>
+                      <td>0,149212595</td>
+                    </tr>
+                    <tr>
+                      <td>k28u</td>
+                      <td>105107</td>
+                      <td>k29u</td>
+                      <td>105163</td>
+                      <td>0,053250668</td>
+                    </tr>
+                    <tr>
+                      <td>k28i</td>
+                      <td>105031</td>
+                      <td>k29i</td>
+                      <td>105077</td>
+                      <td>0,04377742</td>
+                    </tr>
+                  </tbody>
+                </table>            
 
         <p>Uzyskane wyniki wskazują na 3,4-krotne zwiększenie jednolitości oświetlenia w przypadku zastosowania wyściółki PTFE. W kontekście technicznych parametrów akwizycji obrazu, uzyskane wartości są niższe niż progi detekcji odpowiednio dla potencjalnych matryc o głębi koloru 9 bit (0,195%) i 11 bit (0,048%). Potwierdza to skuteczność zaproponowanego rozwiązania, zapewniając, że w idealnych warunkach obraz czystej płytki będzie miał jednolitą jasność z perspektywy sensorów mobilnych (głębia koloru ≥ 8 bit), co rozwiązuje pierwotny problem segmentacji plamek.</p>
 
