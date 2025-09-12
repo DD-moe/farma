@@ -353,18 +353,23 @@ W świetle tych ustaleń oraz dalszej analizy literatury, która wskazała na fo
 
           <div class="image-container">
               <img src="https://farma.1ioe.top/light_equalisation/met/chamber.jpg">
-              <div class="image-caption">Przykładowa komora do smrtfonowej fotografii TLC. ZAuważ, że wycięto przednią ścianę i fragment ścian bocznych z pokrywą.</div>
+              <div class="image-caption">Przykładowa komora do smrtfonowej fotografii TLC. Zauważ, że wycięto przednią ścianę i fragment ścian bocznych z pokrywą.</div>
           </div>        
 
         <h2>Jak to zrobiliśmy?</h2>
 
         <h3>Od literatury do aplikacji: </h3>
 
-        <p>Zaczęliśmy od dokładnego przeszukania książek i artykułów naukowych, żeby dowiedzieć się, jak inni badacze radzili sobie z tym problemem. Na tej podstawie stworzyliśmy sześć wersji naszej aplikacji do analizy zdjęć z płytek. Szybko jednak okazało się, że główną przeszkodą jest nrjednakowe oświetlenie płytek, czyli to, że do jedna jej część jest jaśniejsza na zdjęciu od drugiej.</p>
+        <p>Zaczęliśmy od dokładnego przeszukania książek i artykułów naukowych, żeby dowiedzieć się, jak inni badacze radzili sobie z tym problemem. Na tej podstawie stworzyliśmy sześć wersji naszej aplikacji do analizy zdjęć z płytek. Szybko jednak okazało się, że główną przeszkodą jest niejednakowe oświetlenie płytek, czyli to, że do jedna jej część jest jaśniejsza na zdjęciu od drugiej.</p>
 
         <h3>Symulacje na komputerze</h3>
 
         <p>Zamiast budować dziesiątki różnych prototypów, postanowiliśmy wykorzystać profesjonalny program Blender do symulacji. Stworzyliśmy wirtualną komorę fotograficzną z pojedynczą świetlówką i odbijającą światło powierzchnią. Następnie dla najlepszego modelu komory zbudowaliśmy jej fizyczny prototyp i wyłożyliśmy jej ścianki folią aluminiową - odbijającą światło uv. Nasze wirtualne testy pokazały, że symulacje są bardzo bliskie rzeczywistości, ale... wyniki wciąż były gorsze niż te uzyskane w prostej, fizycznej komorze. To był ważny moment – uświadomiliśmy sobie, że kluczem jest nie tylko sama komora, ale i algorytm do obróbki zdjęć.</p>
+
+          <div class="image-container">
+              <img src="https://farma.1ioe.top/light_equalisation/met/chart.jpg">
+              <div class="image-caption">Porównanie jednolitości oświetlenia dla komory klasycznej i naszej konstrukcji in vivo.</div>
+          </div>  
 
         <h3>Inteligentny algorytm:</h3>
 
@@ -377,6 +382,26 @@ W świetle tych ustaleń oraz dalszej analizy literatury, która wskazała na fo
         <h3>Wirtualne laboratorium:</h3>
 
         <p>Zauważyliśmy, że drogi, ale idealny materiał o nazwie folia teflonowa (PTFE), lepiej odbija światło niż tańsza folia aluminiowa, której używaliśmy wcześniej. Dzięki temu, że nasze symulacje były tak wierne, zrezygnowaliśmy z budowy kolejnych fizycznych prototypów. W pełni przenieśliśmy nasze laboratorium do wirtualnego świata Blender, aby znaleźć idealną konfigurację! Naszym celem było stworzenie takiego oświetlenia, które byłoby tak równe, że nawet 8-bitowa kamera w telefonie nie byłaby w stanie wykryć różnic w jasności. Sprawdzaliśmy różne ustawienia lamp, a także porównywaliśmy różne materiały wyściełające komorę, by znaleźć idealne rozwiązanie. To pozwoliło nam na przeprowadzenie setek testów w ułamku czasu, który zajęłoby to w prawdziwym świecie.</p>
+
+          <div class="image-container">
+              <img src="https://farma.1ioe.top/light_equalisation/met/sections.jpg">
+              <div class="image-caption">Przekroje wzdłuż przekątnej płytki dla każdej z obu lamp z osobna. </div>
+          </div>  
+
+          <div class="image-container">
+              <img src="https://farma.1ioe.top/light_equalisation/met/plots.jpg">
+              <div class="image-caption">Przekrój z połączonych symulacji 2 lamp. </div>
+          </div> 
+
+          <div class="image-container">
+              <img src="https://farma.1ioe.top/light_equalisation/met/sum_sections.jpg">
+              <div class="image-caption">Przekrój z połączonych symulacji 2 lamp. </div>
+          </div>            
+
+          <div class="image-container">
+              <img src="https://farma.1ioe.top/light_equalisation/met/sum_plots.jpg">
+              <div class="image-caption">Przekrój z połączonych symulacji 2 lamp. </div>
+          </div> 
 
       </div>
     </div>
