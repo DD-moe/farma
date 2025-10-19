@@ -21,13 +21,13 @@ self.onconnect = function(e) {
 
         switch (action) {
             case 'add_entry':
-                response = handleAddEntry(role, message);
+                response = handleAddEntry(role, message, action);
                 break;
             case 'read_all':
-                response = handleReadAll(role, token);
+                response = handleReadAll(role, token, action);
                 break;
             case 'read_and_clear':
-                response = handleReadAndClear(role, token);
+                response = handleReadAndClear(role, token, action);
                 break;
             default:
                 response.error = 'Nieznana akcja.';
@@ -47,7 +47,7 @@ self.onconnect = function(e) {
 };
 
 // Funkcja obsługująca dodanie wpisu (rola: "survey")
-function handleAddEntry(role, message) {
+function handleAddEntry(role, message, action) {
     if (role !== "survey") {
         return { success: false, error: "Brak uprawnień. Wymagana rola: 'survey'." };
     }
@@ -65,11 +65,11 @@ function handleAddEntry(role, message) {
     database.push(newEntry);
     console.log(`[Shared Worker] Dodano wpis: LP ${newEntry.lp}`);
 
-    return { success: true, message: `Wpis dodany (LP: ${newEntry.lp}).`, record: newEntry };
+    return { success: true, message: `Wpis dodany (LP: ${newEntry.lp}).`, record: newEntry, action: action };
 }
 
 // Funkcja obsługująca odczyt wszystkich wpisów (rola: "analitic")
-function handleReadAll(role, token) {
+function handleReadAll(role, token, action) {
     if (role !== "analitic" || token !== ACCESS_TOKEN) {
         return { success: false, error: "Brak uprawnień. Wymagana rola: 'analitic' i poprawny token." };
     }
@@ -78,11 +78,11 @@ function handleReadAll(role, token) {
     const data = JSON.parse(JSON.stringify(database));
     console.log(`[Shared Worker] Odczytano ${data.length} wpisów.`);
 
-    return { success: true, data: data, message: `Odczytano ${data.length} wpisów.` };
+    return { success: true, data: data, message: `Odczytano ${data.length} wpisów.`, action: action };
 }
 
 // Funkcja obsługująca odczyt i wyczyszczenie bazy (rola: "analitic")
-function handleReadAndClear(role, token) {
+function handleReadAndClear(role, token, action) {
     if (role !== "analitic" || token !== ACCESS_TOKEN) {
         return { success: false, error: "Brak uprawnień. Wymagana rola: 'analitic' i poprawny token." };
     }
@@ -97,5 +97,5 @@ function handleReadAndClear(role, token) {
 
     console.log(`[Shared Worker] Odczytano i wyczyszczono ${clearedCount} wpisów.`);
 
-    return { success: true, data: dataToReturn, message: `Odczytano ${clearedCount} wpisów i wyczyszczono bazę danych.` };
+    return { success: true, data: dataToReturn, message: `Odczytano ${clearedCount} wpisów i wyczyszczono bazę danych.`, action: action };
 }
