@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Test Web Crypto API (AES-GCM, JWK)</title>
+  <style>
+    body { font-family: system-ui,Segoe UI,Roboto,Arial; max-width:900px; margin:20px auto; line-height:1.5; }
+    h1 { font-size:1.3rem; }
+    section { border:1px solid #ddd; padding:12px; margin:10px 0; border-radius:8px; background:#fafafa; }
+    textarea { width:100%; height:140px; font-family: monospace; font-size:0.9rem; padding:8px; box-sizing:border-box; }
+    .row { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+    button { padding:8px 12px; border-radius:6px; border:1px solid #888; background:#fff; cursor:pointer; }
+    small { color:#555; display:block; margin-top:6px; }
+    #status { margin-top:8px; color:#0a0; }
+    .err { color:#a00; }
+  </style>
+</head>
+<body>
+  <h1>Test Web Crypto API — AES-GCM + JWK</h1>
+
+  <!-- Wspólny textarea do wszystkich sekcji (zgodnie z opisem) -->
+  <section>
+    <label for="mainArea"><strong>Textarea (używana we wszystkich sekcjach)</strong></label>
+    <textarea id="mainArea" placeholder='Tu pojawi się wygenerowany JWK lub wpisz JWK / tekst / zakodowaną wiadomość...'></textarea>
+    <div id="status"></div>
+  </section>
+
+  <!-- 1) Generowanie klucza -->
+  <section>
+    <strong>1) Generuj klucz (AES-GCM 256) → eksportuj do JWK i wklej do textarea</strong>
+    <div class="row">
+      <button id="genKeyBtn">Generuj klucz i eksportuj JWK</button>
+      <button id="genKeyAndEncryptTestBtn">Generuj i zaszyfruj przykładowy tekst</button>
+    </div>
+    <small>Po kliknięciu wygenerowany klucz w formacie JWK zostanie wstawiony do textarea. Możesz go skopiować / zmodyfikować / zapisać.</small>
+  </section>
+
+  <!-- 2) Import klucza z JWK w textarea -->
+  <section>
+    <strong>2) Importuj klucz z JWK (wklej JWK do textarea → kliknij)</strong>
+    <div class="row">
+      <button id="importKeyBtn">Importuj JWK z textarea</button>
+      <button id="clearKeyBtn">Wyczyść zapamiętany klucz</button>
+    </div>
+    <small>Wymagany format: JWK (np. {"kty":"oct","k":"...","alg":"A256GCM","ext":true}). Po imporcie klucz zapisany jest w zmiennej globalnej <code>globalKey</code>.</small>
+  </section>
+
+  <!-- 3) Szyfrowanie tekstu z textarea -->
+  <section>
+    <strong>3) Zaszyfruj tekst z textarea przy użyciu zapamiętanego klucza → zastąp textarea zakodowaną postacią (base64)</strong>
+    <div class="row">
+      <button id="encryptBtn">Zaszyfruj zawartość textarea</button>
+    </div>
+    <small>Wiadomość będzie zaszyfrowana używając AES-GCM z losowym IV (12 bajtów). Wynik (IV + ciphertext) jest zakodowany base64 i wstawiony do textarea.</small>
+  </section>
+
+  <!-- 4) Odszyfrowanie zakodowanej wiadomości z textarea -->
+  <section>
+    <strong>4) Odszyfruj zakodowaną wiadomość z textarea (base64 zawierające IV + ciphertext)</strong>
+    <div class="row">
+      <button id="decryptBtn">Odszyfruj zawartość textarea</button>
+    </div>
+    <small>Oczekuje się, że textarea zawiera base64 zakodowany zestaw: [IV (12 bajtów) || ciphertext]. Po odszyfrowaniu zwykły tekst zostanie wstawiony z powrotem do textarea.</small>
+  </section>
+
+  <script>
+    // Globalny klucz (zmienna globalna zgodnie z życzeniem)
+    let globalKey = null; // CryptoKey
+
+    const mainArea = document.getElementById('mainArea');
+    const statusEl = document.getElementById('status');
+
+    // ----- Helpery: konwersje -----
+    const enc = new TextEncoder();
+    const dec = new TextDecoder();
+
+    function setStatus(msg, isError = false) {
+      statusEl.textContent = msg || '';
+      statusEl.className = isError ? 'err' : '';
+    }
+
+    function arrayBufferToBase64(buffer) {
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      const chunk = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunk) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+      }
+      return btoa(binary);
+    }
+
+    function base64ToArrayBuffer(base64) {
+      const binary = atob(base64);
+      const len = binary.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return bytes.buffer;
+    }
+
+    // ----- Generowanie i eksport JWK -----
+    async function generateKeyAndExportJwk() {
+      try {
+        setStatus('Generowanie klucza...');
+        const key = await crypto.subtle.generateKey(
+          { name: 'AES-GCM', length: 256 },
+          true, // extractable
+          ['encrypt', 'decrypt']
+        );
+        const jwk = await crypto.subtle.exportKey('jwk', key);
+        // jwk.k będzie w base64url (lub podobnym formacie) - pozostawiamy tak jak zwrócone
+        mainArea.value = JSON.stringify(jwk, null, 2);
+        globalKey = key;
+        setStatus('Wygenerowano i wyeksportowano JWK. Klucz zapisany w globalKey.');
+      } catch (err) {
+        console.error(err);
+        setStatus('Błąd podczas generowania/eksportu: ' + err.message, true);
+      }
+    }
+
+    // opcjonalnie: generuj i zaszyfruj przykładowy tekst (dla szybkiego testu)
+    async function generateAndEncryptSample() {
+      await generateKeyAndExportJwk();
+      const sample = 'Przykładowy tekst testowy: ąęółżźćń';
+      mainArea.value = sample;
+      await encryptTextarea(); // użyje globalKey ustawionego powyżej
+    }
+
+    // ----- Import JWK z textarea -----
+    async function importKeyFromTextarea() {
+      try {
+        const text = mainArea.value.trim();
+        if (!text) { setStatus('Textarea jest pusta — wklej JWK JSON.', true); return; }
+        let jwk;
+        try {
+          jwk = JSON.parse(text);
+        } catch (e) {
+          setStatus('Niepoprawny JSON. Sprawdź format JWK.', true);
+          return;
+        }
+        // Zakładamy AES-GCM (oct)
+        setStatus('Importowanie klucza z JWK...');
+        const key = await crypto.subtle.importKey(
+          'jwk',
+          jwk,
+          { name: 'AES-GCM' },
+          true, // extractable
+          ['encrypt', 'decrypt']
+        );
+        globalKey = key;
+        setStatus('Importowano klucz i zapisano w globalKey.');
+      } catch (err) {
+        console.error(err);
+        setStatus('Błąd importu klucza: ' + err.message, true);
+      }
+    }
+
+    // ----- Szyfrowanie zawartości textarea -----
+    async function encryptTextarea() {
+      try {
+        if (!globalKey) { setStatus('Brak zaimportowanego klucza. Wygeneruj lub zaimportuj JWK (sekcja 1 lub 2).', true); return; }
+        const plaintext = mainArea.value;
+        if (plaintext === null || plaintext === undefined) { setStatus('Textarea pusta.', true); return; }
+        setStatus('Szyfrowanie...');
+        const iv = crypto.getRandomValues(new Uint8Array(12)); // zalecane 12 bajtów dla GCM
+        const ptBuf = enc.encode(plaintext);
+        const cipherBuf = await crypto.subtle.encrypt(
+          { name: 'AES-GCM', iv: iv },
+          globalKey,
+          ptBuf
+        );
+        // Połącz iv + ciphertext, zakoduj do base64 i wstaw do textarea
+        const ivAndCipher = new Uint8Array(iv.length + cipherBuf.byteLength);
+        ivAndCipher.set(iv, 0);
+        ivAndCipher.set(new Uint8Array(cipherBuf), iv.length);
+        const b64 = arrayBufferToBase64(ivAndCipher.buffer);
+        mainArea.value = b64;
+        setStatus('Zaszyfrowano — wynik (base64 IV+cipher) w textarea.');
+      } catch (err) {
+        console.error(err);
+        setStatus('Błąd szyfrowania: ' + err.message, true);
+      }
+    }
+
+    // ----- Odszyfrowanie -----
+    async function decryptTextarea() {
+      try {
+        if (!globalKey) { setStatus('Brak zaimportowanego klucza. Wygeneruj lub zaimportuj JWK (sekcja 1 lub 2).', true); return; }
+        const b64 = mainArea.value.trim();
+        if (!b64) { setStatus('Textarea pusta — wklej base64 zawierający IV + ciphertext.', true); return; }
+        setStatus('Dekodowanie base64 i odszyfrowywanie...');
+        const buf = base64ToArrayBuffer(b64);
+        const all = new Uint8Array(buf);
+        if (all.length < 13) { setStatus('Za krótki input — oczekiwano co najmniej 13 bajtów (IV 12 bajtów + ciphertext).', true); return; }
+        const iv = all.slice(0, 12);
+        const cipher = all.slice(12).buffer;
+        const plainBuf = await crypto.subtle.decrypt(
+          { name: 'AES-GCM', iv: iv },
+          globalKey,
+          cipher
+        );
+        const plaintext = dec.decode(plainBuf);
+        mainArea.value = plaintext;
+        setStatus('Odszyfrowano i wstawiono zwykły tekst do textarea.');
+      } catch (err) {
+        console.error(err);
+        setStatus('Błąd odszyfrowania: ' + (err.message || err), true);
+      }
+    }
+
+    // ----- Wyczyść zapamiętany klucz -----
+    function clearKey() {
+      globalKey = null;
+      setStatus('globalKey wyczyszczony (null).');
+    }
+
+    // ----- Podpięcie eventów -----
+    document.getElementById('genKeyBtn').addEventListener('click', generateKeyAndExportJwk);
+    document.getElementById('genKeyAndEncryptTestBtn').addEventListener('click', generateAndEncryptSample);
+    document.getElementById('importKeyBtn').addEventListener('click', importKeyFromTextarea);
+    document.getElementById('encryptBtn').addEventListener('click', encryptTextarea);
+    document.getElementById('decryptBtn').addEventListener('click', decryptTextarea);
+    document.getElementById('clearKeyBtn').addEventListener('click', clearKey);
+
+    // Mały informacyjny komunikat jeśli Web Crypto nie jest dostępne
+    if (!window.crypto || !crypto.subtle) {
+      setStatus('Twoja przeglądarka nie wspiera Web Crypto Subtle API (crypto.subtle).', true);
+      // Dezaktywuj przyciski
+      document.querySelectorAll('button').forEach(b => b.disabled = true);
+    }
+  </script>
+</body>
+</html>

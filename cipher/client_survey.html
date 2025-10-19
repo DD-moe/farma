@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Klient 'Survey' - Dodaj Wpis</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        textarea { width: 90%; height: 100px; margin-bottom: 10px; }
+        button { padding: 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        #status { margin-top: 20px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+    <h1>Klient 'Survey' (Rola: survey)</h1>
+    <h2>Dodaj pojedynczy wpis do bazy</h2>
+
+    <textarea id="messageInput" placeholder="Wprowadź treść wiadomości..."></textarea><br>
+    <button onclick="addEntry()">Wyślij Wpis</button>
+
+    <div id="status">Status: Oczekiwanie na akcję.</div>
+
+    <script>
+        // UWAGA: Ścieżka do Shared Worker musi być poprawna względem pliku HTML
+        const worker = new SharedWorker('server_simulator.js');
+        const port = worker.port;
+
+        // Rozpoczęcie komunikacji
+        port.start();
+
+        // Obsługa wiadomości zwrotnych od Shared Worker
+        port.onmessage = function(e) {
+            const response = e.data;
+            const statusDiv = document.getElementById('status');
+            
+            if (response.success) {
+                statusDiv.style.backgroundColor = '#d4edda';
+                statusDiv.style.color = '#155724';
+                statusDiv.innerHTML = `Sukces! Akcja: ${response.action}. ${response.message}<br>
+                                     Dodany rekord (LP: ${response.record.lp}, Data: ${new Date(response.record.date).toLocaleTimeString()})`;
+                document.getElementById('messageInput').value = ''; // Wyczyść pole po sukcesie
+            } else {
+                statusDiv.style.backgroundColor = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+                statusDiv.innerHTML = `Błąd! Akcja: ${response.action}. ${response.error}`;
+            }
+        };
+
+        // Funkcja do dodawania wpisu
+        function addEntry() {
+            const message = document.getElementById('messageInput').value;
+            if (message.trim() === '') {
+                alert("Wiadomość nie może być pusta!");
+                return;
+            }
+
+            port.postMessage({
+                action: 'add_entry',
+                role: 'survey', // Wymagana rola
+                message: message
+            });
+
+            document.getElementById('status').innerHTML = 'Status: Wysyłanie żądania...';
+        }
+    </script>
+</body>
+</html>

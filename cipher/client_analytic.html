@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Klient 'Analitic' - Odczyt/Czyszczenie</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        input[type="text"] { padding: 8px; margin-bottom: 15px; width: 250px; }
+        button { padding: 10px 15px; margin-right: 10px; cursor: pointer; border: none; color: white; }
+        #readAllBtn { background-color: #2196F3; }
+        #readAndClearBtn { background-color: #f44336; }
+        #readAllBtn:hover { background-color: #0b7dda; }
+        #readAndClearBtn:hover { background-color: #da190b; }
+        #dataTable { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        #dataTable th, #dataTable td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        #dataTable th { background-color: #f2f2f2; }
+        #status { margin-top: 20px; padding: 10px; border: 1px solid #ccc; background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+    <h1>Klient 'Analitic' (Rola: analitic)</h1>
+    <h2>Odczyt i czyszczenie bazy danych</h2>
+
+    <label for="tokenInput">Token Dostępu:</label>
+    <input type="text" id="tokenInput" placeholder="Wprowadź token dostępu">
+    
+    <div>
+        <button id="readAllBtn" onclick="sendAction('read_all')">2. Odczytaj Wszystkie Wpisy</button>
+        <button id="readAndClearBtn" onclick="sendAction('read_and_clear')">3. Odczytaj i Wyczyść Bazę</button>
+    </div>
+
+    <div id="status">Status: Oczekiwanie na akcję.</div>
+    <div id="dataContainer"></div>
+
+    <script>
+        // UWAGA: Ścieżka do Shared Worker musi być poprawna względem pliku HTML
+        const worker = new SharedWorker('server_simulator.js');
+        const port = worker.port;
+
+        // Rozpoczęcie komunikacji
+        port.start();
+
+        // Obsługa wiadomości zwrotnych od Shared Worker
+        port.onmessage = function(e) {
+            const response = e.data;
+            const statusDiv = document.getElementById('status');
+            
+            if (response.success) {
+                statusDiv.style.backgroundColor = '#d4edda';
+                statusDiv.style.color = '#155724';
+                statusDiv.innerHTML = `Sukces! Akcja: ${response.action}. ${response.message}`;
+                
+                displayData(response.data);
+            } else {
+                statusDiv.style.backgroundColor = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+                statusDiv.innerHTML = `Błąd! Akcja: ${response.action}. ${response.error}`;
+                document.getElementById('dataContainer').innerHTML = '';
+            }
+        };
+
+        // Funkcja do wysyłania akcji (odczyt lub odczyt i czyszczenie)
+        function sendAction(action) {
+            const token = document.getElementById('tokenInput').value;
+            
+            port.postMessage({
+                action: action,
+                role: 'analitic', // Wymagana rola
+                token: token
+            });
+
+            document.getElementById('status').innerHTML = 'Status: Wysyłanie żądania...';
+        }
+
+        // Funkcja wyświetlająca dane w postaci tabeli
+        function displayData(data) {
+            const container = document.getElementById('dataContainer');
+            if (data.length === 0) {
+                container.innerHTML = '<p>Baza danych jest pusta lub odczytano 0 wpisów.</p>';
+                return;
+            }
+
+            let html = '<table id="dataTable"><thead><tr><th>LP</th><th>Data Dodania</th><th>Wiadomość (message)</th></tr></thead><tbody>';
+            
+            data.forEach(record => {
+                const date = new Date(record.date).toLocaleString();
+                html += `<tr><td>${record.lp}</td><td>${date}</td><td>${record.message}</td></tr>`;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

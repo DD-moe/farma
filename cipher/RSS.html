@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Test Web Crypto API — RSA-OAEP JWK</title>
+  <style>
+    body { font-family: system-ui,Segoe UI,Roboto,Arial; max-width:900px; margin:20px auto; line-height:1.5; }
+    h1 { font-size:1.3rem; }
+    section { border:1px solid #ddd; padding:12px; margin:10px 0; border-radius:8px; background:#fafafa; }
+    textarea { width:100%; height:140px; font-family: monospace; font-size:0.9rem; padding:8px; box-sizing:border-box; }
+    .row { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
+    button { padding:8px 12px; border-radius:6px; border:1px solid #888; background:#fff; cursor:pointer; }
+    small { color:#555; display:block; margin-top:6px; }
+    #status { margin-top:8px; color:#0a0; }
+    .err { color:#a00; }
+    hr { margin:12px 0; }
+  </style>
+</head>
+<body>
+  <h1>Test Web Crypto API — RSA-OAEP (Public / Private JWK)</h1>
+
+  <!-- SEK 1: Generowanie kluczy -->
+  <section>
+    <strong>1) Generuj parę kluczy (RSA-OAEP 2048) → publiczny i prywatny w formacie JWK</strong>
+    <div class="row">
+      <button id="genRsaBtn">Generuj klucze</button>
+    </div>
+    <div class="row">
+      <div style="flex:1;">
+        <label><strong>Publiczny klucz JWK:</strong></label>
+        <textarea id="pubKeyArea" placeholder="Publiczny klucz JWK"></textarea>
+      </div>
+      <div style="flex:1;">
+        <label><strong>Prywatny klucz JWK:</strong></label>
+        <textarea id="privKeyArea" placeholder="Prywatny klucz JWK"></textarea>
+      </div>
+    </div>
+    <small>Po kliknięciu przycisku wygenerowana para kluczy zostanie wyeksportowana w formacie JWK i wstawiona do powyższych pól. Klucze nie są zapisywane globalnie.</small>
+  </section>
+
+  <!-- SEK 2: Import klucza publicznego + szyfrowanie -->
+  <section>
+    <strong>2) Import klucza publicznego i szyfrowanie</strong>
+    <div>
+      <label>Wklej publiczny klucz JWK:</label>
+      <textarea id="importPubArea" placeholder="Wklej JWK publiczny..."></textarea>
+      <div class="row">
+        <button id="importPubBtn">Importuj publiczny klucz</button>
+      </div>
+    </div>
+    <hr>
+    <div>
+      <label>Tekst do zaszyfrowania:</label>
+      <textarea id="encryptTextArea" placeholder="Wpisz wiadomość do zaszyfrowania..."></textarea>
+      <div class="row">
+        <button id="encryptBtn">Zaszyfruj</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEK 3: Import klucza prywatnego + deszyfrowanie -->
+  <section>
+    <strong>3) Import klucza prywatnego i odszyfrowanie</strong>
+    <div>
+      <label>Wklej prywatny klucz JWK:</label>
+      <textarea id="importPrivArea" placeholder="Wklej JWK prywatny..."></textarea>
+      <div class="row">
+        <button id="importPrivBtn">Importuj prywatny klucz</button>
+      </div>
+    </div>
+    <hr>
+    <div>
+      <label>Zakodowana wiadomość (base64):</label>
+      <textarea id="decryptTextArea" placeholder="Wklej zaszyfrowaną wiadomość (base64)..."></textarea>
+      <div class="row">
+        <button id="decryptBtn">Odszyfruj</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="status"></div>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const enc = new TextEncoder();
+    const dec = new TextDecoder();
+
+    // Zmienna lokalna (NIE globalna) na aktualnie zaimportowane klucze
+    let publicKeyImported = null;
+    let privateKeyImported = null;
+
+    function setStatus(msg, err = false) {
+      statusEl.textContent = msg;
+      statusEl.className = err ? 'err' : '';
+    }
+
+    // ---------- Helpery ----------
+    function arrayBufferToBase64(buffer) {
+      const bytes = new Uint8Array(buffer);
+      let binary = '';
+      const chunk = 0x8000;
+      for (let i = 0; i < bytes.length; i += chunk) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+      }
+      return btoa(binary);
+    }
+
+    function base64ToArrayBuffer(base64) {
+      const binary = atob(base64);
+      const len = binary.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return bytes.buffer;
+    }
+
+    // ---------- Sekcja 1: Generowanie pary RSA ----------
+    async function generateRSAKeys() {
+      try {
+        setStatus('Generuję parę kluczy RSA...');
+        const keyPair = await crypto.subtle.generateKey(
+          {
+            name: 'RSA-OAEP',
+            modulusLength: 2048,
+            publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+            hash: 'SHA-256',
+          },
+          true,
+          ['encrypt', 'decrypt']
+        );
+
+        const pubJwk = await crypto.subtle.exportKey('jwk', keyPair.publicKey);
+        const privJwk = await crypto.subtle.exportKey('jwk', keyPair.privateKey);
+
+        document.getElementById('pubKeyArea').value = JSON.stringify(pubJwk, null, 2);
+        document.getElementById('privKeyArea').value = JSON.stringify(privJwk, null, 2);
+
+        setStatus('Wygenerowano parę kluczy i wyeksportowano do JWK.');
+      } catch (err) {
+        console.error(err);
+        setStatus('Błąd generowania kluczy: ' + err.message, true);
+      }
+    }
+
+    // ---------- Sekcja 2: Import publicznego klucza ----------
+    async function importPublicKey() {
+      try {
+        const txt = document.getElementById('importPubArea').value.trim();
+        if (!txt) { setStatus('Brak danych JWK dla klucza publicznego.', true); return; }
+        const jwk = JSON.parse(txt);
+        const key = await crypto.subtle.importKey(
+          'jwk',
+          jwk,
+          { name: 'RSA-OAEP', hash: 'SHA-256' },
+          false,
+          ['encrypt']
+        );
+        publicKeyImported = key;
+        setStatus('Zaimportowano publiczny klucz.');
+      } catch (err) {
+        console.error(err);
+        setStatus('Błąd importu publicznego klucza: ' + err.message, true);
+      }
+    }
+
+    // ---------- Sekcja 2: Szyfrowanie ----------
+    async function encryptMessage() {
+      try {
+        if (!publicKeyImported) { setStatus('Najpierw zaimportuj publiczny klucz.', true); return; }
+        const message = document.getElementById('encryptTextArea').value;
+        const cipherBuf = await crypto.subtle.encrypt(
+          { name: 'RSA-OAEP' },
+          publicKeyImported,
+          enc.encode(message)
+        );
+        const b64 = arrayBufferToBase64(cipherBuf);
+        document.getElementById('encryptTextArea').value = b64;
+        setStatus('Wiadomość została zaszyfrowana.');
+      } catch (err) {
+        console.error(err);
+        setStatus('Błąd szyfrowania: ' + err.message, true);
+      }
+    }
+
+    // ---------- Sekcja 3: Import prywatnego klucza ----------
+    async function importPrivateKey() {
+      try {
+        const txt = document.getElementById('importPrivArea').value.trim();
+        if (!txt) { setStatus('Brak danych JWK dla klucza prywatnego.', true); return; }
+        const jwk = JSON.parse(txt);
+        const key = await crypto.subtle.importKey(
+          'jwk',
+          jwk,
+          { name: 'RSA-OAEP', hash: 'SHA-256' },
+          false,
+          ['decrypt']
+        );
+        privateKeyImported = key;
+        setStatus('Zaimportowano prywatny klucz.');
+      } catch (err) {
+        console.error(err);
+        setStatus('Błąd importu prywatnego klucza: ' + err.message, true);
+      }
+    }
+
+    // ---------- Sekcja 3: Deszyfrowanie ----------
+    async function decryptMessage() {
+      try {
+        if (!privateKeyImported) { setStatus('Najpierw zaimportuj prywatny klucz.', true); return; }
+        const b64 = document.getElementById('decryptTextArea').value.trim();
+        if (!b64) { setStatus('Brak zakodowanej wiadomości.', true); return; }
+        const cipherBuf = base64ToArrayBuffer(b64);
+        const plainBuf = await crypto.subtle.decrypt(
+          { name: 'RSA-OAEP' },
+          privateKeyImported,
+          cipherBuf
+        );
+        const message = dec.decode(plainBuf);
+        document.getElementById('decryptTextArea').value = message;
+        setStatus('Wiadomość została odszyfrowana.');
+      } catch (err) {
+        console.error(err);
+        setStatus('Błąd deszyfrowania: ' + err.message, true);
+      }
+    }
+
+    // ---------- Eventy ----------
+    document.getElementById('genRsaBtn').addEventListener('click', generateRSAKeys);
+    document.getElementById('importPubBtn').addEventListener('click', importPublicKey);
+    document.getElementById('encryptBtn').addEventListener('click', encryptMessage);
+    document.getElementById('importPrivBtn').addEventListener('click', importPrivateKey);
+    document.getElementById('decryptBtn').addEventListener('click', decryptMessage);
+
+    if (!crypto.subtle) {
+      setStatus('Twoja przeglądarka nie wspiera Web Crypto API.', true);
+      document.querySelectorAll('button').forEach(b => b.disabled = true);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Sprawdzenie Shared Worker</title>
+</head>
+<body>
+
+    <h1>Obsługa Shared Worker</h1>
+    <p>Wynik sprawdzenia:</p>
+    <p id="result">Trwa sprawdzanie...</p>
+
+    <script>
+        /**
+         * Sprawdza, czy przeglądarka obsługuje Shared Worker.
+         * @returns {boolean} True, jeśli Shared Worker jest obsługiwany, w przeciwnym razie false.
+         */
+        function isSharedWorkerSupported() {
+            // Sprawdzenie, czy konstruktor SharedWorker jest dostępny w obiekcie globalnym (window)
+            return 'SharedWorker' in window;
+        }
+
+        const isSupported = isSharedWorkerSupported();
+        const resultElement = document.getElementById('result');
+        let message;
+
+        if (isSupported) {
+            message = "✅ Przeglądarka obsługuje Shared Worker. Możesz użyć Shared Workers do symulacji serwera.";
+            resultElement.style.color = 'green';
+        } else {
+            message = "❌ Przeglądarka NIE obsługuje Shared Worker. Rozważ użycie Dedicated Worker + IndexedDB lub LocalStorage.";
+            resultElement.style.color = 'red';
+        }
+
+        // 1. Wyświetlenie wiadomości w alercie
+        alert(message);
+
+        // 2. Wyświetlenie wiadomości w HTML
+        resultElement.textContent = message;
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Framework Prostych Zakładek</title>
+    <style>
+        /* Prosty CSS dla stylizacji */
+        body { font-family: Arial, sans-serif; }
+        .tab-bar {
+            display: flex;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+        .tab-button {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            background-color: #f1f1f1;
+            transition: background-color 0.3s;
+        }
+        .tab-button:hover {
+            background-color: #ddd;
+        }
+        .tab-button.active {
+            background-color: #fff;
+            border-color: #ccc;
+            border-bottom: 1px solid #fff; /* Opcjonalnie: 'przebija' dolną linię paska */
+            font-weight: bold;
+        }
+        .tab-content {
+            padding: 20px;
+            border: 1px solid #ccc;
+            display: none; /* Domyślnie ukryte */
+        }
+        .tab-content.active {
+            display: block; /* Pokazane, gdy aktywne */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Framework Prostych Zakładek</h1>
+
+    <div class="tab-bar">
+        <button class="tab-button active" data-tab-target="tab1">Zakładka Pierwsza</button>
+        <button class="tab-button" data-tab-target="tab2">Zakładka Druga</button>
+        <button class="tab-button" data-tab-target="tab3">Zakładka Trzecia</button>
+    </div>
+
+    <div class="tab-container">
+
+        <div id="tab1" class="tab-content active">
+            <h2>Treść Zakładki Pierwszej</h2>
+            <p>To jest treść, która jest widoczna, gdy aktywna jest Zakładka Pierwsza. Jest to domyślnie aktywna zakładka.</p>
+        </div>
+        <div id="tab2" class="tab-content">
+            <h2>Treść Zakładki Drugiej</h2>
+            <p>To jest treść Zakładki Drugiej. Jej zawartość jest początkowo ukryta.</p>
+            <p>Możesz tu umieścić unikalną logikę JS dla tej zakładki.</p>
+        </div>
+        <div id="tab3" class="tab-content">
+            <h2>Treść Zakładki Trzeciej</h2>
+            <p>Treść Zakładki Trzeciej, ukryta na starcie.</p>
+        </div>
+        </div>
+
+    <script>
+        // ===============================================
+        // === CZĘŚĆ GŁÓWNA (Logika Przełączania Zakładek)
+        // ===============================================
+
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // Funkcja do przełączania aktywnej zakładki
+        function switchTab(targetId) {
+            // 1. UKRYJ WSZYSTKIE TREŚCI ZAKŁADEK i usuń klasę 'active'
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+            // 2. DEAKTYWUJ WSZYSTKIE PRZYCISKI
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // 3. POKAŻ WYBRANĄ TREŚĆ
+            const targetContent = document.getElementById(targetId);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+
+            // 4. AKTYWUJ PRZYCISK
+            const targetButton = document.querySelector(`.tab-button[data-tab-target="${targetId}"]`);
+            if (targetButton) {
+                targetButton.classList.add('active');
+            }
+        }
+
+        // Dodanie listenerów do wszystkich przycisków zakładek
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.getAttribute('data-tab-target');
+                switchTab(targetId);
+                
+                // === CZĘŚCI SPECYFICZNE DLA DANYCH ZAKŁADEK ===
+                // Wywołanie funkcji specyficznej dla danej zakładki po jej aktywacji
+                if (targetId === 'tab2') {
+                    // Logika, która ma się wykonać tylko po kliknięciu 'Zakładka Druga'
+                    // np. załadowanie danych, aktualizacja licznika itp.
+                    specificLogicForTab2(); 
+                } else {
+                    // Opcjonalnie: logika czyszcząca inne zakładki
+                    cleanUpSpecificLogic();
+                }
+                // ===============================================
+            });
+        });
+
+        // ===============================================
+        // === CZĘŚCI TYLKO DLA DANEJ ZAKŁADKI
+        // === mamy tu proste funkcje symulujące unikalne operacje
+        // ===============================================
+
+        // Specyficzna logika dla Zakładki 2
+        function specificLogicForTab2() {
+            console.log("LOG: Aktywowano logikę specyficzną dla Zakładki 2.");
+            const tab2Content = document.getElementById('tab2');
+            if (!tab2Content.querySelector('#tab2-info')) {
+                 const info = document.createElement('p');
+                 info.id = 'tab2-info';
+                 info.style.color = 'blue';
+                 info.textContent = 'To pole zostało dodane przez JS specyficzny dla Zakładki 2!';
+                 tab2Content.appendChild(info);
+            }
+        }
+
+        // Funkcja czyszcząca, uruchamiana, gdy inna zakładka jest aktywowana
+        function cleanUpSpecificLogic() {
+            console.log("LOG: Czyszczenie logiki specyficznej.");
+            const tab2Content = document.getElementById('tab2');
+            const info = tab2Content.querySelector('#tab2-info');
+            if (info) {
+                info.remove();
+            }
+        }
+
+        // Opcjonalnie: Uruchomienie specyficznej logiki dla domyślnie aktywnej zakładki (jeśli jest)
+        // const defaultTab = document.querySelector('.tab-button.active');
+        // if (defaultTab && defaultTab.getAttribute('data-tab-target') === 'tab2') {
+        //     specificLogicForTab2();
+        // }
+
+
+    </script>
+</body>
+</html>
