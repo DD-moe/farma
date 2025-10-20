@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "nazwa_produktu": "Kawa Espresso",
+    "cena": 12.50,
+    "dostępny": true,
+    "data_dodania": "2024-05-15"
+  },
+  {
+    "id": 2,
+    "nazwa_produktu": "Herbata Czarna Earl Grey",
+    "cena": 8.99,
+    "dostępny": true,
+    "data_dodania": "2024-05-16"
+  },
+  {
+    "id": 3,
+    "nazwa_produktu": "Gorąca Czekolada",
+    "cena": 15.00,
+    "dostępny": false,
+    "data_dodania": "2024-05-15"
+  },
+  {
+    "id": 4,
+    "nazwa_produktu": "Woda Mineralna 0.5L",
+    "cena": 4.00,
+    "dostępny": true,
+    "data_dodania": "2024-05-17"
+  }
+]

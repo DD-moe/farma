@@ -44,26 +44,125 @@
     <h1>Framework Prostych Zakładek</h1>
 
     <div class="tab-bar">
-        <button class="tab-button active" data-tab-target="tab1">Zakładka Pierwsza</button>
-        <button class="tab-button" data-tab-target="tab2">Zakładka Druga</button>
-        <button class="tab-button" data-tab-target="tab3">Zakładka Trzecia</button>
+        <button class="tab-button active" data-tab-target="tab1">Przygotuj klucze</button>
+        <button class="tab-button" data-tab-target="tab2">Przetestuj klucze</button>
+        <button class="tab-button" data-tab-target="tab3">Zarządzaj danymi</button>
     </div>
 
     <div class="tab-container">
 
         <div id="tab1" class="tab-content active">
-            <h2>Treść Zakładki Pierwszej</h2>
+
+            <h2>Tworzenie kluczy, tokenów i schematu danych</h2>
             <p>To jest treść, która jest widoczna, gdy aktywna jest Zakładka Pierwsza. Jest to domyślnie aktywna zakładka.</p>
+
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <div style="flex-grow: 1;">
+                    <h4>Unikalny Token (URL-safe Base64, 16 znaków)</h4>
+                    <input type="text" id="tokenInput" placeholder="Wprowadź token lub użyj generatora" style="width: 100%;">
+                </div>
+                <button id="generateTokenButton" title="Generuje losowy, 16-znakowy, URL-safe Base64 token." style="white-space: nowrap;">Generuj Token</button>
+            </div>
+
+            <hr>
+
+            <h4>Schemat Danych (JSON)</h4>
+            <p>Zdefiniuj strukturę danych. Użyj nazw pól (keys) identycznych jak w bazie danych, przypisując im typy (np. 'int', 'float', 'string', 'boolean').</p>
+            <textarea id="schemaTextarea" rows="8" placeholder='{ "id": "int", "timestamp": "int", "value": "float", "description": "string" }' style="width: 100%;"></textarea>
+
+            <hr>
+
+            <h4>Klucz Publiczny (JWK)</h4>
+            <textarea id="publicKeyTextarea" rows="6" placeholder="Tutaj pojawi się wygenerowany klucz publiczny w formacie JWK" readonly style="width: 100%;"></textarea>
+
+            <h4>Klucz Prywatny (JWK)</h4>
+            <textarea id="privateKeyTextarea" rows="10" placeholder="Tutaj pojawi się wygenerowany klucz prywatny w formacie JWK" readonly style="width: 100%;"></textarea>
+
+            <button id="generateKeysButton" style="margin-top: 10px;">Generuj Klucze (JWK)</button>
+
+            <hr>
+
+            <button id="exportDataButton" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; cursor: pointer;">Eksportuj Dane (JSON)</button>
+
+            <div id="exportMessage" style="margin-top: 10px; color: green;"></div>
+
+
         </div>
+
+
         <div id="tab2" class="tab-content">
-            <h2>Treść Zakładki Drugiej</h2>
-            <p>To jest treść Zakładki Drugiej. Jej zawartość jest początkowo ukryta.</p>
-            <p>Możesz tu umieścić unikalną logikę JS dla tej zakładki.</p>
+
+
+
+            <h2>Testowanie kluczy</h2>
+                <p>Załaduj klucze i dane analityczne, wprowadź przykładowe dane, a następnie przetestuj proces szyfrowania/deszyfrowania oraz walidacji schematu.</p>
+
+                <div class="file-upload-section">
+                    <h4 id="pubKeyHeader">Klucz Publiczny RSA-OAEP (JWK)</h4>
+                    <input type="file" id="pubKeyFile" accept="application/json" onchange="handleFileChange(this, 'publicKey');">
+
+                    <h4 id="analyticDataHeader">Plik Danych Analitycznych (analytic.json)</h4>
+                    <input type="file" id="analyticDataFile" accept="application/json" onchange="handleFileChange(this, 'analyticData');">
+                </div>
+
+                <hr>
+
+                <div class="test-data-section">
+                    <h4 id="inputDataHeader">Wprowadź Przykładowe Dane JSON do Szyfrowania</h4>
+                    <textarea id="inputDataTextarea" rows="10" cols="50" placeholder='{"id": 123, "name": "Testowy Rekord", "isActive": true}'></textarea>
+                    
+                    <button id="testEncryptionButton" onclick="runEncryptionDecryptionTest()" disabled>
+                        Testuj Szyfrowanie, Deszyfrowanie i Walidację
+                    </button>
+
+                    <h4 id="outputDataHeader">Wynik Deszyfrowania i Walidacji</h4>
+                    <textarea id="outputDataTextarea" rows="10" cols="50" readonly placeholder="Odkodowana wiadomość pojawi się tutaj po udanym teście."></textarea>
+                </div>
+
+                <h3 id="errorMessage" style="color: red; margin-top: 20px;"></h3>
+
+
+
         </div>
+
+
+
         <div id="tab3" class="tab-content">
-            <h2>Treść Zakładki Trzeciej</h2>
-            <p>Treść Zakładki Trzeciej, ukryta na starcie.</p>
+
+
+
+            <h2>Zarządzanie Danymi</h2>
+
+                <label for="jsonFileInput">Wczytaj pliki JSON (wiele plików):</label>
+                <input type="file" id="jsonFileInput" accept=".json" multiple>
+                
+                <h4 id="loadStatus" style="color: green; display: none;">✅ Sukces: Dane JSON wczytane i połączone!</h4>
+
+                <hr>
+                
+                <label>
+                    <input type="checkbox" id="useGlobalDataCheckbox" checked>
+                    Użyj danych ze zmiennej globalnej (zamiast serwera)
+                </label>
+
+                <hr>
+                
+                <div class="data-actions">
+                    <button id="displayDataBtn">Wyświetl Dane</button>
+                    <button id="clearDataBtn">Usuń Dane</button>
+                    <button id="exportDataBtn">Eksportuj Dane</button>
+                </div>
+
+                <hr>
+
+                <div id="dataDisplayArea" style="margin-top: 20px;"></div>
+
+
+
         </div>
+
+
+
         </div>
 
     <script>
@@ -118,39 +217,734 @@
             });
         });
 
+
+
         // ===============================================
-        // === CZĘŚCI TYLKO DLA DANEJ ZAKŁADKI
-        // === mamy tu proste funkcje symulujące unikalne operacje
+        // === CZĘŚCI TYLKO DLA 1 ZAKŁADKI
         // ===============================================
 
-        // Specyficzna logika dla Zakładki 2
-        function specificLogicForTab2() {
-            console.log("LOG: Aktywowano logikę specyficzną dla Zakładki 2.");
-            const tab2Content = document.getElementById('tab2');
-            if (!tab2Content.querySelector('#tab2-info')) {
-                 const info = document.createElement('p');
-                 info.id = 'tab2-info';
-                 info.style.color = 'blue';
-                 info.textContent = 'To pole zostało dodane przez JS specyficzny dla Zakładki 2!';
-                 tab2Content.appendChild(info);
+
+        // --- Funkcja Pomocnicza do Generowania Tokenu URL-safe Base64 ---
+        /**
+         * Generuje losowy ciąg znaków o określonej długości, bezpieczny dla URL (URL-safe Base64).
+         * @param {number} length Długość tokenu.
+         * @returns {string} Losowy token.
+         */
+        function generateUrlSafeBase64Token(length) {
+            // Generuje losowe bajty
+            const randomBytes = new Uint8Array(Math.ceil(length * 3 / 4));
+            window.crypto.getRandomValues(randomBytes);
+            
+            // Konwertuje bajty na Base64 i robi URL-safe
+            let base64 = btoa(String.fromCharCode(...randomBytes))
+                .replace(/\+/g, '-') // '+' na '-'
+                .replace(/\//g, '_'); // '/' na '_'
+            
+            // Usuwa znaki paddingu '='
+            base64 = base64.replace(/=+$/, '');
+            
+            // Przytnij do żądanej długości
+            return base64.substring(0, length);
+        }
+
+        // --- Funkcja Pomocnicza do Pobierania Pliku JSON ---
+        /**
+         * Tworzy i symuluje kliknięcie linku do pobrania pliku JSON.
+         * @param {object} data Obiekt do eksportu.
+         * @param {string} filename Nazwa pliku.
+         */
+        function downloadJsonFile(data, filename) {
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // --- Logika dla Generowania Tokenu ---
+        document.getElementById('generateTokenButton').addEventListener('click', () => {
+            const token = generateUrlSafeBase64Token(16);
+            document.getElementById('tokenInput').value = token;
+        });
+
+        // UWAGA: Funkcje generateUrlSafeBase64Token, downloadJsonFile oraz logika 
+        // obsługi przycisków 'generateTokenButton' i 'exportDataButton' 
+        // są takie same jak w poprzedniej odpowiedzi. 
+
+        // --- Logika dla Generowania Kluczy JWK (RSA-OAEP) ---
+        document.getElementById('generateKeysButton').addEventListener('click', async () => {
+            const publicKeyTextarea = document.getElementById('publicKeyTextarea');
+            const privateKeyTextarea = document.getElementById('privateKeyTextarea');
+
+            try {
+                // Generowanie pary kluczy RSA-OAEP
+                const keyPair = await window.crypto.subtle.generateKey(
+                    {
+                        name: "RSA-OAEP",
+                        modulusLength: 2048, // Typowa długość klucza
+                        publicExponent: new Uint8Array([0x01, 0x00, 0x01]), // 65537
+                        hash: "SHA-256",
+                    },
+                    true, // Klucze są extractable (można je eksportować)
+                    ["encrypt", "decrypt", "wrapKey", "unwrapKey"] // Zastosowanie kluczy (szyfrowanie)
+                );
+
+                // Eksport klucza publicznego do formatu JWK
+                const publicKeyJwk = await window.crypto.subtle.exportKey(
+                    "jwk",
+                    keyPair.publicKey
+                );
+                publicKeyTextarea.value = JSON.stringify(publicKeyJwk, null, 2);
+
+                // Eksport klucza prywatnego do formatu JWK
+                const privateKeyJwk = await window.crypto.subtle.exportKey(
+                    "jwk",
+                    keyPair.privateKey
+                );
+                privateKeyTextarea.value = JSON.stringify(privateKeyJwk, null, 2);
+                
+                document.getElementById('exportMessage').textContent = "Klucze RSA-OAEP (2048 bit) wygenerowane pomyślnie! 🔒";
+
+            } catch (e) {
+                console.error("Błąd podczas generowania kluczy RSA-OAEP:", e);
+                publicKeyTextarea.value = "Błąd generowania klucza publicznego.";
+                privateKeyTextarea.value = "Błąd generowania klucza prywatnego.";
+                document.getElementById('exportMessage').textContent = "Błąd podczas generowania kluczy. Sprawdź konsolę.";
+            }
+        });
+
+
+        // --- Logika dla Eksportu Danych ---
+        document.getElementById('exportDataButton').addEventListener('click', () => {
+            const token = document.getElementById('tokenInput').value;
+            const schema = document.getElementById('schemaTextarea').value;
+            const privKey = document.getElementById('privateKeyTextarea').value;
+            const pubKey = document.getElementById('publicKeyTextarea').value;
+            const messageElement = document.getElementById('exportMessage');
+
+            // Walidacja podstawowa
+            if (!token || !schema || !privKey || !pubKey) {
+                messageElement.textContent = "Proszę uzupełnić wszystkie pola (Token, Schemat, Klucze)!";
+                messageElement.style.color = "red";
+                return;
+            }
+
+            try {
+                // Sprawdzenie poprawności JSONa schematu i kluczy
+                const schemaObj = JSON.parse(schema);
+                const privKeyObj = JSON.parse(privKey);
+                const pubKeyObj = JSON.parse(pubKey);
+
+                // 1. analytic.json
+                const analyticData = {
+                    token: token,
+                    schema: schemaObj,
+                    privKey: privKeyObj 
+                };
+                downloadJsonFile(analyticData, 'analytic.json');
+
+                // 2. public.json
+                // Plik public.json zawiera tylko klucz publiczny
+                downloadJsonFile(pubKeyObj, 'public.json'); 
+                
+                messageElement.textContent = "Dane wyeksportowane pomyślnie jako analytic.json i public.json! 🎉";
+                messageElement.style.color = "green";
+
+            } catch (e) {
+                console.error("Błąd parsowania JSON lub eksportu:", e);
+                messageElement.textContent = "Błąd: Upewnij się, że Schemat i Klucze są poprawnym formatem JSON.";
+                messageElement.style.color = "red";
+            }
+        });
+
+        // Ustawienie wartości domyślnych dla schematu
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('schemaTextarea').value = 
+        `{
+        "record_id": "number",
+        "device_name": "string",
+        "is_active": "boolean"
+        }`;
+        });
+
+
+        // ===============================================
+        // === CZĘŚCI TYLKO DLA 2 ZAKŁADKI
+        // ===============================================
+
+        // Zmienne globalne do przechowywania zaimportowanych danych
+        let GLOBAL_PUB_KEY = null;
+        let GLOBAL_PRIV_KEY = null;
+        let GLOBAL_SCHEMA = null;
+        let GLOBAL_TOKEN = null;
+
+        const ERROR_DISPLAY = document.getElementById('errorMessage');
+        const TEST_BUTTON = document.getElementById('testEncryptionButton');
+
+        /**
+         * Funkcja obsługująca ładowanie plików i parsowanie JSON.
+         * Ustawia globalne zmienne.
+         * @param {HTMLInputElement} input - Element input[type="file"].
+         * @param {string} type - Typ pliku ('publicKey' lub 'analyticData').
+         */
+        async function handleFileChange(input, type) {
+            ERROR_DISPLAY.textContent = ''; // Czyść poprzedni błąd
+            if (input.files.length === 0) return;
+
+            const file = input.files[0];
+            const reader = new FileReader();
+
+            reader.onload = async (event) => {
+                try {
+                    const content = event.target.result;
+                    const data = JSON.parse(content);
+
+                    if (type === 'publicKey') {
+                        // Publiczny klucz RSA-OAEP w formacie JWK
+                        await importPublicKey(data);
+                        document.getElementById('pubKeyHeader').style.color = 'green';
+                    } else if (type === 'analyticData') {
+                        // Plik analytic.json zawierający token, schema i privKey
+                        if (!data.token || !data.schema || !data.privKey) {
+                            throw new Error("Plik analytic.json musi zawierać 'token', 'schema' i 'privKey'.");
+                        }
+                        GLOBAL_TOKEN = data.token;
+                        GLOBAL_SCHEMA = data.schema;
+                        await importPrivateKey(data.privKey);
+                        document.getElementById('analyticDataHeader').style.color = 'green';
+                    }
+
+                    checkDependencies();
+                } catch (error) {
+                    ERROR_DISPLAY.textContent = `Błąd parsowania lub importu ${type}: ${error.message}`;
+                    // W przypadku błędu resetujemy zmienne i stan
+                    if (type === 'publicKey') {
+                        GLOBAL_PUB_KEY = null;
+                        document.getElementById('pubKeyHeader').style.color = 'black';
+                    } else if (type === 'analyticData') {
+                        GLOBAL_PRIV_KEY = null;
+                        GLOBAL_SCHEMA = null;
+                        GLOBAL_TOKEN = null;
+                        document.getElementById('analyticDataHeader').style.color = 'black';
+                    }
+                    checkDependencies();
+                }
+            };
+
+            reader.readAsText(file);
+        }
+
+        /**
+         * Importuje klucz publiczny RSA-OAEP (JWK) do Web Crypto API.
+         * @param {object} jwk - Obiekt klucza w formacie JWK.
+         */
+        async function importPublicKey(jwk) {
+            GLOBAL_PUB_KEY = await crypto.subtle.importKey(
+                "jwk",
+                jwk,
+                {
+                    name: "RSA-OAEP",
+                    hash: "SHA-256"
+                },
+                true, // extractable
+                ["wrapKey", "encrypt"]
+            );
+        }
+
+        /**
+         * Importuje klucz prywatny RSA-OAEP (JWK) do Web Crypto API.
+         * @param {object} jwk - Obiekt klucza w formacie JWK.
+         */
+        async function importPrivateKey(jwk) {
+            GLOBAL_PRIV_KEY = await crypto.subtle.importKey(
+                "jwk",
+                jwk,
+                {
+                    name: "RSA-OAEP",
+                    hash: "SHA-256"
+                },
+                true, // extractable
+                ["unwrapKey", "decrypt"]
+            );
+        }
+
+        /**
+         * Sprawdza, czy wszystkie niezbędne klucze i schemat zostały załadowane.
+         * Uaktywnia/dezaktywuje przycisk testowy.
+         */
+        function checkDependencies() {
+            if (GLOBAL_PUB_KEY && GLOBAL_PRIV_KEY && GLOBAL_SCHEMA) {
+                TEST_BUTTON.disabled = false;
+                TEST_BUTTON.textContent = 'Testuj Szyfrowanie, Deszyfrowanie i Walidację (Gotowe)';
+            } else {
+                TEST_BUTTON.disabled = true;
+                TEST_BUTTON.textContent = 'Testuj Szyfrowanie, Deszyfrowanie i Walidację (Oczekiwanie na klucze)';
             }
         }
 
-        // Funkcja czyszcząca, uruchamiana, gdy inna zakładka jest aktywowana
-        function cleanUpSpecificLogic() {
-            console.log("LOG: Czyszczenie logiki specyficznej.");
-            const tab2Content = document.getElementById('tab2');
-            const info = tab2Content.querySelector('#tab2-info');
-            if (info) {
-                info.remove();
+        /**
+         * Konwertuje ArrayBuffer na Base64 (string).
+         * @param {ArrayBuffer} buffer - Bufor do konwersji.
+         * @returns {string} Base64 zakodowany ciąg.
+         */
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary);
+        }
+
+        /**
+         * Konwertuje Base64 (string) na ArrayBuffer.
+         * @param {string} base64 - Base64 zakodowany ciąg.
+         * @returns {ArrayBuffer} ArrayBuffer.
+         */
+        function base64ToArrayBuffer(base64) {
+            const binary_string = atob(base64);
+            const len = binary_string.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binary_string.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        /**
+         * Waliduje typy danych w rekordzie JSON na podstawie schematu.
+         * @param {object} record - Rekord danych do walidacji.
+         * @param {object} schema - Schemat JSON (keys: nazwa pola, value: oczekiwany typ JS).
+         * @returns {boolean} True, jeśli walidacja pomyślna.
+         * @throws {Error} Jeśli walidacja nie powiedzie się.
+         */
+        function validateSchema(record, schema) {
+            const recordKeys = Object.keys(record);
+            const schemaKeys = Object.keys(schema);
+
+            // 1. Sprawdzenie, czy rekord ma wszystkie pola ze schematu
+            const missingKeys = schemaKeys.filter(key => !(key in record));
+            if (missingKeys.length > 0) {
+                throw new Error(`Brakujące klucze w rekordzie: ${missingKeys.join(', ')}`);
+            }
+
+            // 2. Sprawdzenie typów danych i dodatkowych kluczy
+            for (const key in record) {
+                if (!schema[key]) {
+                    throw new Error(`Klucz '${key}' nie jest zdefiniowany w schemacie.`);
+                }
+                
+                const expectedType = schema[key];
+                const actualType = typeof record[key];
+
+                // Sprawdzenie typu (prymitywy JS)
+                if (actualType !== expectedType) {
+                    throw new Error(`Błąd typu dla klucza '${key}'. Oczekiwano: ${expectedType}, Otrzymano: ${actualType} (Wartość: ${record[key]}).`);
+                }
+            }
+
+            return true;
+        }
+
+        /**
+         * Główna funkcja testująca proces szyfrowania, deszyfrowania i walidacji schematu.
+         */
+        async function runEncryptionDecryptionTest() {
+            ERROR_DISPLAY.textContent = '';
+            document.getElementById('outputDataTextarea').value = '';
+            
+            if (!GLOBAL_PUB_KEY || !GLOBAL_PRIV_KEY || !GLOBAL_SCHEMA) {
+                ERROR_DISPLAY.textContent = 'Brak załadowanych kluczy lub schematu.';
+                return;
+            }
+
+            const inputDataTextarea = document.getElementById('inputDataTextarea');
+            let dataToEncrypt;
+            let decodedData;
+
+            try {
+                // 1. Parsowanie i Stringifikacja danych wejściowych
+                dataToEncrypt = JSON.parse(inputDataTextarea.value);
+                const stringifiedData = JSON.stringify(dataToEncrypt);
+                const dataBuffer = new TextEncoder().encode(stringifiedData);
+                
+                // 2. Generowanie klucza AES-GCM
+                const aesKey = await crypto.subtle.generateKey(
+                    {
+                        name: "AES-GCM",
+                        length: 256,
+                    },
+                    true, // extractable
+                    ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
+                );
+
+                // 3. Generowanie IV i Wrap klucza AES-GCM (RSA-OAEP, klucz PUBLICZNY)
+                const iv = crypto.getRandomValues(new Uint8Array(12)); // IV dla AES-GCM
+                const wrappedKeyBuffer = await crypto.subtle.wrapKey(
+                    "raw",
+                    aesKey,
+                    GLOBAL_PUB_KEY,
+                    {
+                        name: "RSA-OAEP"
+                    }
+                );
+
+                // 4. Szyfrowanie wiadomości (AES-GCM)
+                const ciphertextBuffer = await crypto.subtle.encrypt(
+                    {
+                        name: "AES-GCM",
+                        iv: iv,
+                    },
+                    aesKey,
+                    dataBuffer
+                );
+                
+                // --- Symulacja transmisji ---
+                // W realnej aplikacji, te dane: (wrappedKeyBase64, ivBase64, ciphertextBase64)
+                // byłyby przesyłane do serwera.
+                const wrappedKeyBase64 = arrayBufferToBase64(wrappedKeyBuffer);
+                const ivBase64 = arrayBufferToBase64(iv.buffer);
+                const ciphertextBase64 = arrayBufferToBase64(ciphertextBuffer);
+
+                // --- DEKODOWANIE ---
+                
+                // 5. Unwrap klucza AES-GCM (RSA-OAEP, klucz PRYWATNY)
+                const unwrappedKey = await crypto.subtle.unwrapKey(
+                    "raw",
+                    base64ToArrayBuffer(wrappedKeyBase64),
+                    GLOBAL_PRIV_KEY,
+                    {
+                        name: "RSA-OAEP"
+                    },
+                    {
+                        name: "AES-GCM"
+                    },
+                    false, // not extractable
+                    ["decrypt"]
+                );
+
+                // 6. Deszyfrowanie wiadomości (AES-GCM)
+                const decryptedBuffer = await crypto.subtle.decrypt(
+                    {
+                        name: "AES-GCM",
+                        iv: base64ToArrayBuffer(ivBase64),
+                    },
+                    unwrappedKey,
+                    base64ToArrayBuffer(ciphertextBase64)
+                );
+
+                // 7. Dekodowanie i Parsowanie wiadomości
+                const decryptedString = new TextDecoder().decode(decryptedBuffer);
+                decodedData = JSON.parse(decryptedString);
+
+                // 8. Walidacja Schematu
+                validateSchema(decodedData, GLOBAL_SCHEMA);
+                
+                // 9. Wyświetlenie wyniku
+                document.getElementById('outputDataTextarea').value = JSON.stringify(decodedData, null, 2);
+                ERROR_DISPLAY.textContent = '✅ Sukces! Szyfrowanie, deszyfrowanie i walidacja schematu udane.';
+                ERROR_DISPLAY.style.color = 'green';
+
+            } catch (error) {
+                ERROR_DISPLAY.textContent = `❌ Błąd w procesie testowania: ${error.message}`;
+                ERROR_DISPLAY.style.color = 'red';
+                document.getElementById('outputDataTextarea').value = '';
             }
         }
 
-        // Opcjonalnie: Uruchomienie specyficznej logiki dla domyślnie aktywnej zakładki (jeśli jest)
-        // const defaultTab = document.querySelector('.tab-button.active');
-        // if (defaultTab && defaultTab.getAttribute('data-tab-target') === 'tab2') {
-        //     specificLogicForTab2();
-        // }
+        // Inicjalizacja stanu przycisku
+        document.addEventListener('DOMContentLoaded', checkDependencies);
+
+
+
+        // ===============================================
+        // === CZĘŚCI TYLKO DLA 3 ZAKŁADKI
+        // ===============================================
+
+
+        // Zmienna globalna przechowująca połączone rekordy JSON
+        let globalRecords = [];
+
+        // Elementy DOM
+        const jsonFileInput = document.getElementById('jsonFileInput');
+        const loadStatus = document.getElementById('loadStatus');
+        const useGlobalDataCheckbox = document.getElementById('useGlobalDataCheckbox');
+        const displayDataBtn = document.getElementById('displayDataBtn');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+        const exportDataBtn = document.getElementById('exportDataBtn');
+        const dataDisplayArea = document.getElementById('dataDisplayArea');
+
+        /**
+         * Ułatwiająca funkcja do pobierania danych na podstawie stanu checkboxa.
+         * Zwraca Promise, który rozwiązuje się z tablicą rekordów.
+         */
+        function getRecords() {
+            return new Promise((resolve, reject) => {
+                if (useGlobalDataCheckbox.checked) {
+                    // Dane ze zmiennej globalnej
+                    if (globalRecords.length > 0) {
+                        console.log('Dane pobrane ze zmiennej globalnej.');
+                        resolve(globalRecords);
+                    } else {
+                        reject('Brak danych w zmiennej globalnej. Wczytaj pliki JSON.');
+                    }
+                } else {
+                    // Dane z serwera (POST)
+                    console.log('Pobieranie danych z serwera...');
+                    // TUTAJ MIEJSCE NA LOGIKĘ POBIERANIA Z SERWERA (fetch/axios POST)
+                    // Przykład:
+                    /*
+                    fetch('/api/get-records', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Dane pobrane z serwera.', data);
+                        resolve(data); // data to powinna być array obiektów (rekordów)
+                    })
+                    .catch(error => {
+                        console.error('Błąd pobierania danych z serwera:', error);
+                        reject('Nie udało się pobrać danych z serwera.');
+                    });
+                    */
+                    reject('Ładowanie z serwera niezaimplementowane. Zaznacz checkbox, aby użyć danych lokalnych.');
+                }
+            });
+        }
+
+        /**
+         * Generuje i wyświetla tabelę HTML z rekordów.
+         * @param {Array<Object>} records - Tablica obiektów (rekordów) do wyświetlenia.
+         */
+        function displayTable(records) {
+            dataDisplayArea.innerHTML = ''; // Czyści poprzedni widok
+
+            if (!Array.isArray(records) || records.length === 0) {
+                dataDisplayArea.innerHTML = '<p style="color: red;">Brak danych do wyświetlenia.</p>';
+                return;
+            }
+
+            // 1. Nazwy kolumn z kluczy pierwszego obiektu
+            const headers = Object.keys(records[0]);
+            
+            let tableHTML = '<table>';
+            
+            // Nagłówek tabeli
+            tableHTML += '<thead><tr>';
+            headers.forEach(header => {
+                tableHTML += `<th>${header}</th>`;
+            });
+            tableHTML += '</tr></thead>';
+
+            // Ciało tabeli
+            tableHTML += '<tbody>';
+            records.forEach(record => {
+                tableHTML += '<tr>';
+                headers.forEach(header => {
+                    // Używamy safe access (np. String(record[header]) || '') na wypadek braku klucza
+                    // lub wartości, ale zwykle JSONy są spójne.
+                    const value = record[header] !== undefined ? record[header] : '';
+                    tableHTML += `<td>${value}</td>`;
+                });
+                tableHTML += '</tr>';
+            });
+            tableHTML += '</tbody></table>';
+
+            dataDisplayArea.innerHTML = tableHTML;
+        }
+
+        /**
+         * Parsuje pliki JSON i łączy je w globalną tablicę.
+         */
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            globalRecords = []; // Reset globalnej tablicy
+
+            if (files.length === 0) {
+                loadStatus.style.display = 'none';
+                return;
+            }
+
+            let filesProcessed = 0;
+            loadStatus.style.display = 'none'; // Ukryj na czas przetwarzania
+            
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const content = e.target.result;
+                        const jsonArray = JSON.parse(content);
+
+                        // Walidacja: czy jest tablicą i czy elementy są obiektami
+                        if (Array.isArray(jsonArray) && jsonArray.every(item => typeof item === 'object' && item !== null && !Array.isArray(item))) {
+                            // Połączenie rekordów
+                            globalRecords = globalRecords.concat(jsonArray);
+                            console.log(`Pomyślnie wczytano ${jsonArray.length} rekordów z pliku: ${file.name}`);
+                        } else {
+                            console.error(`Plik ${file.name} nie zawiera tablicy obiektów.`);
+                            alert(`Błąd: Plik ${file.name} nie zawiera tablicy obiektów. Przetwarzanie przerwane.`);
+                            jsonFileInput.value = ''; // Wyczyść input
+                            globalRecords = []; // Usuń częściowo wczytane dane
+                            loadStatus.style.display = 'none';
+                            return;
+                        }
+
+                    } catch (error) {
+                        console.error(`Błąd parsowania pliku ${file.name}:`, error);
+                        alert(`Błąd parsowania pliku: ${file.name}. Upewnij się, że to poprawny JSON.`);
+                        jsonFileInput.value = ''; // Wyczyść input
+                        globalRecords = []; // Usuń częściowo wczytane dane
+                        loadStatus.style.display = 'none';
+                        return;
+                    }
+                    
+                    filesProcessed++;
+                    if (filesProcessed === files.length) {
+                        // Wszystkie pliki przetworzone
+                        loadStatus.innerText = `✅ Sukces: Wczytano i połączono ${globalRecords.length} rekordów z ${files.length} plików!`;
+                        loadStatus.style.display = 'block';
+                        console.log('Ostateczna liczba rekordów:', globalRecords.length);
+                    }
+                };
+                reader.readAsText(file);
+            });
+        }
+
+        /**
+         * Pobiera dane i uruchamia funkcję wyświetlającą je w tabeli.
+         */
+        function handleDisplayData() {
+            dataDisplayArea.innerHTML = '<p>Ładowanie danych...</p>';
+            getRecords()
+                .then(records => {
+                    displayTable(records);
+                })
+                .catch(error => {
+                    dataDisplayArea.innerHTML = `<p style="color: red;">❌ Błąd: ${error}</p>`;
+                    console.error('Błąd wyświetlania danych:', error);
+                });
+        }
+
+        /**
+         * Generuje plik JSON i uruchamia jego pobieranie.
+         * @param {Array<Object>} data - Dane do eksportu.
+         * @param {string} fileNamePrefix - Prefiks nazwy pliku.
+         */
+        function downloadJSON_dated(data, fileNamePrefix) {
+            const jsonString = JSON.stringify(data, null, 2); // Wcięcia dla czytelności
+            const dateStr = new Date().toISOString(); // Format YYYY-MM-DD
+            const fileName = `${fileNamePrefix}_${dateStr}.json`;
+            
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            console.log(`Pomyślnie wyeksportowano dane do pliku: ${fileName}`);
+        }
+
+        /**
+         * Obsługuje usuwanie danych (lokalnie lub na serwerze).
+         */
+        function handleClearData() {
+            dataDisplayArea.innerHTML = ''; // Czyści widok
+            
+            if (useGlobalDataCheckbox.checked) {
+                // Usuń zmienną globalną i zapisz jej zawartość przed usunięciem
+                if (globalRecords.length > 0) {
+                    downloadJSON_dated(globalRecords, 'cleared_local_data_backup');
+                    globalRecords = [];
+                    loadStatus.innerText = '✅ Sukces: Dane globalne usunięte. Utworzono kopię zapasową.';
+                    loadStatus.style.display = 'block';
+                    jsonFileInput.value = ''; // Czyścimy input
+                } else {
+                    alert('Brak danych do usunięcia w zmiennej globalnej.');
+                    loadStatus.style.display = 'none';
+                }
+            } else {
+                // Usuń z serwera i zapisz zawartość bazy danych (zwróconą przez serwer)
+                console.log('Wysyłanie POST do usunięcia danych z serwera...');
+                // TUTAJ MIEJSCE NA LOGIKĘ USUWANIA Z SERWERA (POST - zwraca dane, potem usuwa)
+                // Przykład:
+                /*
+                fetch('/api/clear-records', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({}) // Może zawierać token, etc.
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // data to powinna być array obiektów zwrócona przed usunięciem
+                    if (Array.isArray(data) && data.length > 0) {
+                        downloadJSON_dated(data, 'cleared_server_data_backup');
+                        loadStatus.innerText = '✅ Sukces: Dane z serwera usunięte. Utworzono kopię zapasową.';
+                        loadStatus.style.display = 'block';
+                    } else {
+                        alert('Serwer zwrócił puste dane lub błąd podczas usuwania.');
+                        loadStatus.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Błąd usuwania danych z serwera:', error);
+                    alert('Nie udało się usunąć danych z serwera.');
+                    loadStatus.style.display = 'none';
+                });
+                */
+                alert('Usuwanie z serwera niezaimplementowane. Użyto tylko logiki backupu lokalnego przed usunięciem globalnej zmiennej.');
+            }
+        }
+
+        /**
+         * Obsługuje eksport danych (lokalnie lub z serwera).
+         */
+        function handleExportData() {
+            if (useGlobalDataCheckbox.checked) {
+                // Eksport ze zmiennej globalnej
+                if (globalRecords.length > 0) {
+                    downloadJSON_dated(globalRecords, 'exported_local_data');
+                } else {
+                    alert('Brak danych do eksportu w zmiennej globalnej.');
+                }
+            } else {
+                // Eksport z serwera: pobiera dane POSTem (tak jak "Wyświetl Dane") i eksportuje
+                console.log('Pobieranie danych z serwera do eksportu...');
+                // getRecords() używa tego samego POSTa
+                getRecords()
+                    .then(records => {
+                        if (records.length > 0) {
+                            downloadJSON_dated(records, 'exported_server_data');
+                        } else {
+                            alert('Serwer zwrócił puste dane do eksportu.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Błąd eksportu danych z serwera:', error);
+                        alert('Nie udało się pobrać danych z serwera do eksportu.');
+                    });
+            }
+        }
+
+        // Dodanie słuchaczy zdarzeń
+        jsonFileInput.addEventListener('change', handleFileSelect);
+        displayDataBtn.addEventListener('click', handleDisplayData);
+        clearDataBtn.addEventListener('click', handleClearData);
+        exportDataBtn.addEventListener('click', handleExportData);
+
 
 
     </script>
