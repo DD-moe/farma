@@ -56,10 +56,9 @@
             <h2>Tworzenie kluczy, tokenów i schematu danych</h2>
 
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-                <div style="flex-grow: 1;">
-                    <h4>Unikalny Token (URL-safe Base64, 16 znaków)</h4>
-                    <input type="text" id="tokenInput" placeholder="Wprowadź token lub użyj generatora" style="width: 100%;">
-                </div>
+                <h4>Unikalny Token (URL-safe Base64, 16 znaków)</h4>
+                <br>
+                <input type="text" id="tokenInput" placeholder="Wprowadź token lub użyj generatora" style="width: 100%;">
                 <button id="generateTokenButton" title="Generuje losowy, 16-znakowy, URL-safe Base64 token." style="white-space: nowrap;">Generuj Token</button>
             </div>
 
@@ -109,7 +108,7 @@
                 <div class="test-data-section">
                     <h4 id="inputDataHeader">Wprowadź Przykładowe Dane JSON do Szyfrowania</h4>
                     <textarea id="inputDataTextarea" rows="10" cols="50" placeholder='{"id": 123, "name": "Testowy Rekord", "isActive": true}'></textarea>
-                    
+                    <br>
                     <button id="testEncryptionButton" onclick="runEncryptionDecryptionTest()" disabled>
                         Testuj Szyfrowanie, Deszyfrowanie i Walidację
                     </button>
@@ -166,7 +165,7 @@
 
     <script>
         // ===============================================
-        // === CZĘŚĆ GŁÓWNA (Logika Przełączania Zakładek)
+        // === CZĘŚĆ GŁÓWNA (Logika Przełączania Zakładek) - logika uniwersalna dla zakładek
         // ===============================================
 
         const tabButtons = document.querySelectorAll('.tab-button');
@@ -201,20 +200,32 @@
             button.addEventListener('click', () => {
                 const targetId = button.getAttribute('data-tab-target');
                 switchTab(targetId);
-                
-                // === CZĘŚCI SPECYFICZNE DLA DANYCH ZAKŁADEK ===
-                // Wywołanie funkcji specyficznej dla danej zakładki po jej aktywacji
-                if (targetId === 'tab2') {
-                    // Logika, która ma się wykonać tylko po kliknięciu 'Zakładka Druga'
-                    // np. załadowanie danych, aktualizacja licznika itp.
-                    specificLogicForTab2(); 
-                } else {
-                    // Opcjonalnie: logika czyszcząca inne zakładki
-                    cleanUpSpecificLogic();
-                }
-                // ===============================================
             });
         });
+
+        /**
+         * Generuje plik JSON i uruchamia jego pobieranie.
+         * @param {Array<Object>} data - Dane do eksportu.
+         * @param {string} fileNamePrefix - Prefiks nazwy pliku.
+         */
+        function downloadJSON_dated(data, fileNamePrefix) {
+            const jsonString = JSON.stringify(data, null, 2); // Wcięcia dla czytelności
+            const dateStr = new Date().toISOString(); // Format YYYY-MM-DD
+            const fileName = `${fileNamePrefix}_${dateStr}.json`;
+            
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            console.log(`Pomyślnie wyeksportowano dane do pliku: ${fileName}`);
+        }
 
 
 
@@ -244,26 +255,6 @@
             
             // Przytnij do żądanej długości
             return base64.substring(0, length);
-        }
-
-        // --- Funkcja Pomocnicza do Pobierania Pliku JSON ---
-        /**
-         * Tworzy i symuluje kliknięcie linku do pobrania pliku JSON.
-         * @param {object} data Obiekt do eksportu.
-         * @param {string} filename Nazwa pliku.
-         */
-        function downloadJsonFile(data, filename) {
-            const json = JSON.stringify(data, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
         }
 
         // --- Logika dla Generowania Tokenu ---
@@ -346,11 +337,11 @@
                     schema: schemaObj,
                     privKey: privKeyObj 
                 };
-                downloadJsonFile(analyticData, 'analytic.json');
+                downloadJSON_dated(analyticData, 'analytic');
 
                 // 2. public.json
                 // Plik public.json zawiera tylko klucz publiczny
-                downloadJsonFile(pubKeyObj, 'public.json'); 
+                downloadJSON_dated(pubKeyObj, 'public');
                 
                 messageElement.textContent = "Dane wyeksportowane pomyślnie jako analytic.json i public.json! 🎉";
                 messageElement.style.color = "green";
@@ -552,101 +543,135 @@
             return true;
         }
 
-        /**
-         * Główna funkcja testująca proces szyfrowania, deszyfrowania i walidacji schematu.
-         */
+        // funkcja do zakodowania wiadomości
+        async function create_encrypted_message(message, GLOBAL_PUB_KEY){
+            const stringifiedData = JSON.stringify(message); // 1) JSON dla wiadomości
+            const dataBuffer = new TextEncoder().encode(stringifiedData); // 2) data buffer dla zakodowanych danych
+
+            // 3) Generowanie klucza AES-GCM
+            const aesKey = await crypto.subtle.generateKey(
+                {
+                    name: "AES-GCM",
+                    length: 256,
+                },
+                true, // extractable
+                ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
+            );          
+            
+            // 4) Generowanie IV i Wrap klucza AES-GCM (RSA-OAEP, klucz PUBLICZNY)
+            const iv = crypto.getRandomValues(new Uint8Array(12)); // IV dla AES-GCM
+            const wrappedKeyBuffer = await crypto.subtle.wrapKey(
+                "raw",
+                aesKey,
+                GLOBAL_PUB_KEY,
+                {
+                    name: "RSA-OAEP"
+                }
+            );            
+            
+            // 5) Szyfrowanie wiadomości (AES-GCM)
+            const ciphertextBuffer = await crypto.subtle.encrypt(
+                {
+                    name: "AES-GCM",
+                    iv: iv,
+                },
+                aesKey,
+                dataBuffer
+            );            
+
+            // 6) konwersja zaszyfrowanych danych do base64
+            const wrappedKeyBase64 = arrayBufferToBase64(wrappedKeyBuffer);
+            const ivBase64 = arrayBufferToBase64(iv.buffer);
+            const ciphertextBase64 = arrayBufferToBase64(ciphertextBuffer);
+
+            // 7) zwracanie standardowego JSON dla wiadomości
+            return JSON.stringify({wk: wrappedKeyBase64, iv: ivBase64, ct: ciphertextBase64});
+
+        };
+
+
+        // funkcja do odkodowania wiadomości
+        async function create_decrypted_message(standard_message, GLOBAL_PRIV_KEY, GLOBAL_SCHEMA){
+            try {
+            // 1) parsowanie standard_message
+            const sm = JSON.parse(standard_message);
+
+            // 2) rozdział sm na składowe
+            const wrappedKeyBase64 = sm.wk;
+            const ivBase64 = sm.iv;
+            const ciphertextBase64 = sm.ct;
+
+            // 3) Unwrap klucza AES-GCM (RSA-OAEP, klucz PRYWATNY)
+            const unwrappedKey = await crypto.subtle.unwrapKey(
+                "raw",
+                base64ToArrayBuffer(wrappedKeyBase64),
+                GLOBAL_PRIV_KEY,
+                {
+                    name: "RSA-OAEP"
+                },
+                {
+                    name: "AES-GCM"
+                },
+                false, // not extractable
+                ["decrypt"]
+            );            
+
+            // 4) Deszyfrowanie wiadomości (AES-GCM)
+            const decryptedBuffer = await crypto.subtle.decrypt(
+                {
+                    name: "AES-GCM",
+                    iv: base64ToArrayBuffer(ivBase64),
+                },
+                unwrappedKey,
+                base64ToArrayBuffer(ciphertextBase64)
+            );
+
+            // 5) Dekodowanie i Parsowanie wiadomości
+            const decryptedString = new TextDecoder().decode(decryptedBuffer);
+            const decodedData = JSON.parse(decryptedString);
+
+            // 6. Walidacja Schematu
+            validateSchema(decodedData, GLOBAL_SCHEMA);
+
+            return decodedData;
+            } catch (error) {
+                // Przekazujemy błąd dalej, aby został obsłużony w runEncryptionDecryptionTest
+                throw new Error(`Błąd deszyfrowania lub walidacji: ${error.message}`);
+            }            
+        }
+
+        // funkcja symulująca całą logikę szyfrowania wiadomości
         async function runEncryptionDecryptionTest() {
             ERROR_DISPLAY.textContent = '';
             document.getElementById('outputDataTextarea').value = '';
-            
+
             if (!GLOBAL_PUB_KEY || !GLOBAL_PRIV_KEY || !GLOBAL_SCHEMA) {
                 ERROR_DISPLAY.textContent = 'Brak załadowanych kluczy lub schematu.';
+                ERROR_DISPLAY.style.color = 'red';
                 return;
             }
 
             const inputDataTextarea = document.getElementById('inputDataTextarea');
             let dataToEncrypt;
+            let encryptedMessageJSON;
             let decodedData;
 
             try {
-                // 1. Parsowanie i Stringifikacja danych wejściowych
+                // 1. Parsowanie danych wejściowych z textarea
                 dataToEncrypt = JSON.parse(inputDataTextarea.value);
-                const stringifiedData = JSON.stringify(dataToEncrypt);
-                const dataBuffer = new TextEncoder().encode(stringifiedData);
-                
-                // 2. Generowanie klucza AES-GCM
-                const aesKey = await crypto.subtle.generateKey(
-                    {
-                        name: "AES-GCM",
-                        length: 256,
-                    },
-                    true, // extractable
-                    ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
-                );
 
-                // 3. Generowanie IV i Wrap klucza AES-GCM (RSA-OAEP, klucz PUBLICZNY)
-                const iv = crypto.getRandomValues(new Uint8Array(12)); // IV dla AES-GCM
-                const wrappedKeyBuffer = await crypto.subtle.wrapKey(
-                    "raw",
-                    aesKey,
-                    GLOBAL_PUB_KEY,
-                    {
-                        name: "RSA-OAEP"
-                    }
-                );
+                // 2. SZYFROWANIE: Wywołanie funkcji tworzącej zaszyfrowaną wiadomość
+                // W realnej aplikacji wynik byłby wysłany do serwera (używamy GLOBAL_PUB_KEY do wrapKey).
+                encryptedMessageJSON = await create_encrypted_message(dataToEncrypt, GLOBAL_PUB_KEY);
 
-                // 4. Szyfrowanie wiadomości (AES-GCM)
-                const ciphertextBuffer = await crypto.subtle.encrypt(
-                    {
-                        name: "AES-GCM",
-                        iv: iv,
-                    },
-                    aesKey,
-                    dataBuffer
-                );
-                
                 // --- Symulacja transmisji ---
-                // W realnej aplikacji, te dane: (wrappedKeyBase64, ivBase64, ciphertextBase64)
-                // byłyby przesyłane do serwera.
-                const wrappedKeyBase64 = arrayBufferToBase64(wrappedKeyBuffer);
-                const ivBase64 = arrayBufferToBase64(iv.buffer);
-                const ciphertextBase64 = arrayBufferToBase64(ciphertextBuffer);
+                // Tutaj 'encryptedMessageJSON' to dane, które byłyby przesłane (wk, iv, ct).
 
-                // --- DEKODOWANIE ---
-                
-                // 5. Unwrap klucza AES-GCM (RSA-OAEP, klucz PRYWATNY)
-                const unwrappedKey = await crypto.subtle.unwrapKey(
-                    "raw",
-                    base64ToArrayBuffer(wrappedKeyBase64),
-                    GLOBAL_PRIV_KEY,
-                    {
-                        name: "RSA-OAEP"
-                    },
-                    {
-                        name: "AES-GCM"
-                    },
-                    false, // not extractable
-                    ["decrypt"]
-                );
+                // 3. DESZYFROWANIE: Wywołanie funkcji deszyfrującej i walidującej schemat
+                // Serwer (lub inna strona) używa GLOBAL_PRIV_KEY do unwrapKey.
+                decodedData = await create_decrypted_message(encryptedMessageJSON, GLOBAL_PRIV_KEY, GLOBAL_SCHEMA);
 
-                // 6. Deszyfrowanie wiadomości (AES-GCM)
-                const decryptedBuffer = await crypto.subtle.decrypt(
-                    {
-                        name: "AES-GCM",
-                        iv: base64ToArrayBuffer(ivBase64),
-                    },
-                    unwrappedKey,
-                    base64ToArrayBuffer(ciphertextBase64)
-                );
-
-                // 7. Dekodowanie i Parsowanie wiadomości
-                const decryptedString = new TextDecoder().decode(decryptedBuffer);
-                decodedData = JSON.parse(decryptedString);
-
-                // 8. Walidacja Schematu
-                validateSchema(decodedData, GLOBAL_SCHEMA);
-                
-                // 9. Wyświetlenie wyniku
+                // 4. Wyświetlenie wyniku
                 document.getElementById('outputDataTextarea').value = JSON.stringify(decodedData, null, 2);
                 ERROR_DISPLAY.textContent = '✅ Sukces! Szyfrowanie, deszyfrowanie i walidacja schematu udane.';
                 ERROR_DISPLAY.style.color = 'green';
@@ -666,6 +691,38 @@
         // ===============================================
         // === CZĘŚCI TYLKO DLA 3 ZAKŁADKI
         // ===============================================
+
+
+        // TYMCZASOWA FUNKCJA DO ŁADOWANIA DANYCH Z LOCAL-STORAGE
+        function LoadEncryptedMessage() {
+            const storageKey = 'simulationOfServerDB';
+            let dbArray = [];
+
+            // 1. Wczytaj istniejącą zawartość
+            const storedData = localStorage.getItem(storageKey);
+
+            if (storedData) {
+                try {
+                    dbArray = JSON.parse(storedData);
+                    // Upewnij się, że to jest tablica
+                    if (!Array.isArray(dbArray)) {
+                        console.warn("Dane w Local Storage nie są tablicą. Zostaną zresetowane.");
+                        dbArray = [];
+                    }
+                } catch (e) {
+                    console.error("Błąd parsowania Local Storage. Dane zostaną zresetowane.", e);
+                    dbArray = [];
+                }
+            }
+
+            return dbArray;
+        }
+
+        // TYMCZASOWA FUNKCJA DO CZYSZCZENIA DANYCH Z LOCAL-STORAGE
+        function ClearServerSimulation(){
+            const storageKey = 'simulationOfServerDB';
+            localStorage.removeItem(storageKey);
+        }
 
 
         // Zmienna globalna przechowująca połączone rekordy JSON
@@ -715,9 +772,38 @@
                         reject('Nie udało się pobrać danych z serwera.');
                     });
                     */
-                    reject('Ładowanie z serwera niezaimplementowane. Zaznacz checkbox, aby użyć danych lokalnych.');
+                    
+                    // TYMCZASOWO
+                    const data = LoadEncryptedMessage();
+                    resolve(decryptArray(data) );
                 }
             });
+        }
+
+        // funkcja zwracająca tablicę odszyfrowanych danych
+        async function decryptArray(data) {
+            // 1. Inicjalizacja tablicy na odszyfrowane dane
+            const decryptedArray = [];
+            // 2. Iteracja po każdym elemencie w tablicy 'data'
+            for (const element of data) {
+                try {
+                    if (!element || !element.encryptedData) {
+                        console.error("Błąd: Element lub pole 'encryptedData' jest nieobecne.", element);
+                        continue; // Przechodzi do następnego elementu
+                    }
+                    
+                    const decodedData = await create_decrypted_message(element.encryptedData, GLOBAL_PRIV_KEY, GLOBAL_SCHEMA);
+                    
+                    // 5. Dodanie odszyfrowanych danych do tablicy wynikowej
+                    decryptedArray.push(decodedData);
+
+                } catch (error) {
+                    console.error("Błąd podczas przetwarzania elementu:", error, "Element:", element);
+                }
+            }
+
+            // 6. Zwrócenie tablicy odszyfrowanych danych
+            return decryptedArray;
         }
 
         /**
@@ -834,33 +920,9 @@
         }
 
         /**
-         * Generuje plik JSON i uruchamia jego pobieranie.
-         * @param {Array<Object>} data - Dane do eksportu.
-         * @param {string} fileNamePrefix - Prefiks nazwy pliku.
-         */
-        function downloadJSON_dated(data, fileNamePrefix) {
-            const jsonString = JSON.stringify(data, null, 2); // Wcięcia dla czytelności
-            const dateStr = new Date().toISOString(); // Format YYYY-MM-DD
-            const fileName = `${fileNamePrefix}_${dateStr}.json`;
-            
-            const blob = new Blob([jsonString], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            console.log(`Pomyślnie wyeksportowano dane do pliku: ${fileName}`);
-        }
-
-        /**
          * Obsługuje usuwanie danych (lokalnie lub na serwerze).
          */
-        function handleClearData() {
+        async function handleClearData() {
             dataDisplayArea.innerHTML = ''; // Czyści widok
             
             if (useGlobalDataCheckbox.checked) {
@@ -904,7 +966,14 @@
                     loadStatus.style.display = 'none';
                 });
                 */
-                alert('Usuwanie z serwera niezaimplementowane. Użyto tylko logiki backupu lokalnego przed usunięciem globalnej zmiennej.');
+                // TYMCZASOWO
+                const data = LoadEncryptedMessage();
+                const DataToExport = await decryptArray(data);
+                console.log(DataToExport, DataToExport.length);
+                if (DataToExport.length >= 1){
+                    downloadJSON_dated(DataToExport, 'cleared_server_data_backup');
+                }
+                ClearServerSimulation();
             }
         }
 

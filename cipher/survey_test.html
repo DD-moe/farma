@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ankieta - Wiedza o Nikotynie (Demo Szyfrowania)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        .question-block {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .question-block h3 {
+            margin-top: 0;
+            color: #555;
+            font-size: 1.1em;
+        }
+        .option-label {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .option-label:hover {
+            background-color: #e2f0ff;
+        }
+        .option-label input[type="checkbox"] {
+            /* Ukrywamy domyślny checkbox dla stylizacji jednokrotnego wyboru */
+            display: none; 
+        }
+        /* Styl dla niestandardowego 'checkboxa' */
+        .option-label span::before {
+            content: '';
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #007bff;
+            border-radius: 4px;
+            margin-right: 12px;
+            background-color: white;
+            transition: background-color 0.2s;
+        }
+        /* Styl dla zaznaczonego 'checkboxa' */
+        .option-label input:checked + span::before {
+            content: '✓';
+            font-size: 14px;
+            line-height: 18px;
+            text-align: center;
+            color: white;
+            background-color: #007bff;
+        }
+        
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        button:hover {
+            background-color: #1e7e34;
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        #message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #ffc107;
+            text-align: center;
+            color: #333;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ankieta: Wiedza o Uzależnieniu od Nikotyny</h1>
+        <form id="surveyForm">
+            <div class="question-block" data-question-name="Główna substancja uzależniająca">
+                <h3>1. Jaka jest główna substancja uzależniająca w papierosach?</h3>
+                <label class="option-label">
+                    <input type="checkbox" name="q1" value="Kofeina">
+                    <span>Kofeina</span>
+                </label>
+                <label class="option-label">
+                    <input type="checkbox" name="q1" value="Nikotyna">
+                    <span>Nikotyna</span>
+                </label>
+                <label class="option-label">
+                    <input type="checkbox" name="q1" value="Tlenek węgla">
+                    <span>Tlenek węgla</span>
+                </label>
+            </div>
+
+            <div class="question-block" data-question-name="Czas działania nikotyny">
+                <h3>2. Czy nikotyna jest substancją działającą krótko czy długo?</h3>
+                <label class="option-label">
+                    <input type="checkbox" name="q2" value="Krótko (kilka godzin)">
+                    <span>Krótko (kilka godzin)</span>
+                </label>
+                <label class="option-label">
+                    <input type="checkbox" name="q2" value="Długo (cały dzień)">
+                    <span>Długo (cały dzień)</span>
+                </label>
+            </div>
+
+            <div class="question-block" data-question-name="Najczęstszy objaw odstawienia">
+                <h3>3. Najczęstszy objaw odstawienia nikotyny to:</h3>
+                <label class="option-label">
+                    <input type="checkbox" name="q3" value="Nadmierna senność">
+                    <span>Nadmierna senność</span>
+                </label>
+                <label class="option-label">
+                    <input type="checkbox" name="q3" value="Wzrost apetytu i drażliwość">
+                    <span>Wzrost apetytu i drażliwość</span>
+                </label>
+                <label class="option-label">
+                    <input type="checkbox" name="q3" value="Nagłe obniżenie ciśnienia">
+                    <span>Nagłe obniżenie ciśnienia</span>
+                </label>
+            </div>
+
+            <button type="submit">Wyślij i Zaszyfruj Odpowiedzi</button>
+        </form>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        // #################################################
+        // #            Funkcje kryptograficzne            #
+        // #################################################
+        let GLOBAL_PUB_KEY = null;
+
+        // ** UWAGA: Wklej swój prawidłowy obiekt JWK poniżej **
+        // Aktualnie jest to pusty obiekt.
+        const JWK_PUB_KEY = `{
+  "alg": "RSA-OAEP-256",
+  "e": "AQAB",
+  "ext": true,
+  "key_ops": [
+    "encrypt",
+    "wrapKey"
+  ],
+  "kty": "RSA",
+  "n": "xU9pJXAPpsrqdbcBR-6NhUEkAwYMBD3LJvprzFXBXyay5nm9zcsiPL9mpX9I5VUHgzqeSo88mtiQR54Tn8H2DS-z1cKIgjF92GPUAwJeoWuBlowyKeit3eQrnzT8Hr2PKCnYP9wAWSFekx3LeQB1OLMKcBLlekPq3OuRxH2QWixfI0EULdiUYTcrKN34PuB3G8Yee896mPFJJzEinRatUYvxEzAjn-48ay8gRAhBFpQvg-ys_viSjHJj-SRqFPzufrOE6jf_rQd95F3SDTv3GVkXaa-lcmHUnKRcDhnV5HmCTvUu0yiT-bTaIJZBSecfqFuZeCnQwPOACsCVRO5rww"
+}`;
+
+        /**
+         * Konwertuje ArrayBuffer na Base64 (string).
+         * @param {ArrayBuffer} buffer - Bufor do konwersji.
+         * @returns {string} Base64 zakodowany ciąg.
+         */
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary);
+        }
+
+        /**
+         * Importuje klucz publiczny RSA-OAEP (JWK) do Web Crypto API.
+         * @param {object} jwk - Obiekt klucza w formacie JWK.
+         */
+        async function importPublicKey(jwk) {
+            try {
+                GLOBAL_PUB_KEY = await crypto.subtle.importKey(
+                    "jwk",
+                    jwk,
+                    {
+                        name: "RSA-OAEP",
+                        hash: "SHA-256"
+                    },
+                    true, // extractable
+                    ["wrapKey", "encrypt"]
+                );
+            } catch (error) {
+                console.error("Błąd importu klucza publicznego:", error);
+                document.getElementById('message').textContent = "Błąd: Nie można załadować klucza szyfrującego.";
+                document.getElementById('message').style.backgroundColor = '#dc3545';
+                document.getElementById('message').style.display = 'block';
+                throw new Error("Nieprawidłowy lub brakujący klucz JWK.");
+            }
+        }
+
+        /**
+         * Funkcja do zakodowania wiadomości (Hybrid Encryption: AES-GCM + RSA-OAEP).
+         * @param {object} message - Obiekt wiadomości do zaszyfrowania.
+         * @param {CryptoKey} GLOBAL_PUB_KEY - Klucz publiczny RSA.
+         * @returns {string} Zaszyfrowana wiadomość w formacie JSON (wk, iv, ct w Base64).
+         */
+        async function create_encrypted_message(message, GLOBAL_PUB_KEY){
+            const stringifiedData = JSON.stringify(message); // 1) JSON dla wiadomości
+            const dataBuffer = new TextEncoder().encode(stringifiedData); // 2) data buffer dla zakodowanych danych
+
+            // 3) Generowanie klucza AES-GCM
+            const aesKey = await crypto.subtle.generateKey(
+                {
+                    name: "AES-GCM",
+                    length: 256,
+                },
+                true, // extractable
+                ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
+            );          
+            
+            // 4) Generowanie IV i Wrap klucza AES-GCM (RSA-OAEP, klucz PUBLICZNY)
+            const iv = crypto.getRandomValues(new Uint8Array(12)); // IV dla AES-GCM
+            const wrappedKeyBuffer = await crypto.subtle.wrapKey(
+                "raw",
+                aesKey,
+                GLOBAL_PUB_KEY,
+                {
+                    name: "RSA-OAEP"
+                }
+            );            
+            
+            // 5) Szyfrowanie wiadomości (AES-GCM)
+            const ciphertextBuffer = await crypto.subtle.encrypt(
+                {
+                    name: "AES-GCM",
+                    iv: iv,
+                },
+                aesKey,
+                dataBuffer
+            );            
+
+            // 6) konwersja zaszyfrowanych danych do base64
+            const wrappedKeyBase64 = arrayBufferToBase64(wrappedKeyBuffer);
+            const ivBase64 = arrayBufferToBase64(iv.buffer);
+            const ciphertextBase64 = arrayBufferToBase64(ciphertextBuffer);
+
+            // 7) zwracanie standardowego JSON dla wiadomości
+            return JSON.stringify({wk: wrappedKeyBase64, iv: ivBase64, ct: ciphertextBase64});
+
+        };
+
+
+        // #################################################
+        // #            Logika Ankiety i Przetwarzania     #
+        // #################################################
+
+        /**
+         * Implementuje logikę jednokrotnego wyboru dla checkboxów w danym bloku pytań.
+         * @param {Event} event - Zdarzenie kliknięcia.
+         */
+        function handleSingleSelect(event) {
+            const clickedCheckbox = event.target;
+            if (clickedCheckbox.type !== 'checkbox') return;
+
+            const questionBlock = clickedCheckbox.closest('.question-block');
+            const checkboxes = questionBlock.querySelectorAll('input[type="checkbox"]');
+
+            // Odznacz wszystkie pozostałe w tym bloku
+            checkboxes.forEach(cb => {
+                if (cb !== clickedCheckbox) {
+                    cb.checked = false;
+                }
+            });
+        }
+
+        /**
+         * Wczytuje symulowaną bazę danych z Local Storage, dodaje zaszyfrowany wpis i zapisuje.
+         * @param {string} encryptedMessage - Zaszyfrowana wiadomość.
+         */
+        function saveEncryptedMessage(encryptedMessage) {
+            const storageKey = 'simulationOfServerDB';
+            let dbArray = [];
+
+            // 1. Wczytaj istniejącą zawartość
+            const storedData = localStorage.getItem(storageKey);
+
+            if (storedData) {
+                try {
+                    dbArray = JSON.parse(storedData);
+                    // Upewnij się, że to jest tablica
+                    if (!Array.isArray(dbArray)) {
+                        console.warn("Dane w Local Storage nie są tablicą. Zostaną zresetowane.");
+                        dbArray = [];
+                    }
+                } catch (e) {
+                    console.error("Błąd parsowania Local Storage. Dane zostaną zresetowane.", e);
+                    dbArray = [];
+                }
+            }
+
+            // 2. Dodaj nowy zaszyfrowany wpis
+            dbArray.push({
+                timestamp: new Date().toISOString(),
+                encryptedData: encryptedMessage
+            });
+
+            // 3. Zapisz z powrotem do Local Storage
+            localStorage.setItem(storageKey, JSON.stringify(dbArray));
+            
+            const messageEl = document.getElementById('message');
+            messageEl.style.backgroundColor = '#d4edda'; // Zielony kolor dla sukcesu
+            messageEl.style.color = '#155724';
+            messageEl.textContent = `Odpowiedź zaszyfrowana i zapisana do Local Storage (klucz: '${storageKey}').`;
+            messageEl.style.display = 'block';
+
+            //console.log("Zapisano zaszyfrowaną wiadomość do Local Storage.", dbArray);
+        }
+
+        /**
+         * Obsługa formularza (zbieranie, szyfrowanie, zapis).
+         * @param {Event} event - Zdarzenie submit.
+         */
+        async function handleSubmit(event) {
+            event.preventDefault();
+
+            // 1. Import klucza (tylko raz)
+            if (!GLOBAL_PUB_KEY) {
+                await importPublicKey(JSON.parse(JWK_PUB_KEY));
+            }
+            
+            if (!GLOBAL_PUB_KEY) return; // Przerwij, jeśli import klucza się nie powiódł
+
+            const form = event.target;
+            const questions = form.querySelectorAll('.question-block');
+            const surveyResults = {};
+            let isFormValid = true;
+
+            // 2. Zbieranie odpowiedzi
+            questions.forEach(block => {
+                const questionName = block.getAttribute('data-question-name');
+                const checkedCheckbox = block.querySelector('input[type="checkbox"]:checked');
+
+                if (checkedCheckbox) {
+                    surveyResults[questionName] = checkedCheckbox.value;
+                } else {
+                    isFormValid = false;
+                    // Można dodać wizualne oznaczenie brakującego pytania
+                    block.style.border = '2px solid red';
+                }
+            });
+
+            console.log(JSON.stringify(surveyResults));
+            
+            // Wyczyść ewentualne komunikaty o błędach wizualnych i sprawdź poprawność
+            questions.forEach(block => block.style.border = '1px solid #ddd');
+            if (!isFormValid) {
+                const messageEl = document.getElementById('message');
+                messageEl.style.backgroundColor = '#ffc107';
+                messageEl.style.color = '#333';
+                messageEl.textContent = "Proszę odpowiedzieć na wszystkie pytania.";
+                messageEl.style.display = 'block';
+                return;
+            }
+
+
+            try {
+                // 3. Serializacja do JSON (już wewnątrz create_encrypted_message, ale dla jasności)
+                
+                // 4. Szyfrowanie
+                const encryptedMessage = await create_encrypted_message(surveyResults, GLOBAL_PUB_KEY);
+
+                // 5. Zapis do Local Storage
+                saveEncryptedMessage(encryptedMessage);
+
+            } catch (error) {
+                console.error("Błąd podczas szyfrowania lub zapisu:", error);
+                const messageEl = document.getElementById('message');
+                messageEl.style.backgroundColor = '#dc3545';
+                messageEl.style.color = 'white';
+                messageEl.textContent = "Wystąpił błąd podczas szyfrowania. Sprawdź konsolę (i klucz JWK).";
+                messageEl.style.display = 'block';
+            }
+        }
+
+        // #################################################
+        // #            Inicjalizacja Zdarzeń              #
+        // #################################################
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('surveyForm');
+            
+            // Dodanie nasłuchu na jednokrotny wybór w każdym bloku pytań
+            document.querySelectorAll('.question-block').forEach(block => {
+                block.addEventListener('change', handleSingleSelect);
+            });
+
+            // Dodanie nasłuchu na wysłanie formularza
+            form.addEventListener('submit', handleSubmit);
+        });
+
+    </script>
+</body>
+</html>
