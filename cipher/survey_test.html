@@ -183,39 +183,39 @@
 }`;
 
 
-/**
- * 1. Wysyła dane ankiety (wiadomość) do serwera.
- * Endpoint: POST /survey
- * @param {string} message - Wiadomość/zaszyfrowane dane do zapisania.
- * @returns {Promise<object>} Obiekt odpowiedzi z serwera.
- */
-async function submitSurvey(message) {
-    console.log(`Próba wysłania wiadomości...`);
-    
-    try {
-        const response = await fetch(`${API_BASE_URL}/survey`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: message
-        });
+        /**
+         * 1. Wysyła dane ankiety (wiadomość) do serwera.
+         * Endpoint: POST /survey
+         * @param {string} message - Wiadomość/zaszyfrowane dane do zapisania.
+         * @returns {Promise<object>} Obiekt odpowiedzi z serwera.
+         */
+        async function submitSurvey(message) {
+            console.log(`Próba wysłania wiadomości...`);
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/survey`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: message
+                });
 
-        const result = await response.json();
+                const result = await response.json();
 
-        if (response.ok) {
-            console.log("Sukces! Dane zapisane pomyślnie:", result);
-            return result;
-        } else {
-            console.error(`Błąd serwera (Status: ${response.status}):`, result.message);
-            throw new Error(result.message || `Wystąpił błąd podczas zapisywania ankiety. Kod: ${response.status}`);
+                if (response.ok) {
+                    console.log("Sukces! Dane zapisane pomyślnie:", result);
+                    return result;
+                } else {
+                    console.error(`Błąd serwera (Status: ${response.status}):`, result.message);
+                    throw new Error(result.message || `Wystąpił błąd podczas zapisywania ankiety. Kod: ${response.status}`);
+                }
+
+            } catch (error) {
+                console.error("Błąd połączenia z serwerem ankiet:", error.message);
+                throw error;
+            }
         }
-
-    } catch (error) {
-        console.error("Błąd połączenia z serwerem ankiet:", error.message);
-        throw error;
-    }
-}
 
         /**
          * Konwertuje ArrayBuffer na Base64 (string).
@@ -427,6 +427,7 @@ async function submitSurvey(message) {
                 
                 // 4. Szyfrowanie
                 const encryptedMessage = await create_encrypted_message(surveyResults, GLOBAL_PUB_KEY);
+                console.log(JSON.stringify(encryptedMessage));
 
                 // 5. Zapis do Local Storage
                 if (localStorage.getItem('czyWypelnionoJuzAnikete') === 'Y') {
