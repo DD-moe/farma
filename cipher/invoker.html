@@ -1099,7 +1099,7 @@
                 const response = await fetch(`${API_BASE_URL}/download`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${ACCESS_TOKEN}`, // Wymagany nagłówek autoryzacyjny
+                        'Authorization': `Bearer ${GLOBAL_TOKEN}`, // Wymagany nagłówek autoryzacyjny
                         'Content-Type': 'application/json'
                     },
                 });
@@ -1132,7 +1132,7 @@
                 const response = await fetch(`${API_BASE_URL}/clear`, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${ACCESS_TOKEN}`, // Wymagany nagłówek autoryzacyjny
+                        'Authorization': `Bearer ${GLOBAL_TOKEN}`, // Wymagany nagłówek autoryzacyjny
                         'Content-Type': 'application/json'
                     },
                 });

@@ -1,3 +1,5 @@
 {"Główna substancja uzależniająca": "'Nikotyna'", "Czas działania nikotyny": "'Krótko (kilka godzin)'", "Najczęstszy objaw odstawienia": "'Nadmierna senność'"}
 
 {"Główna substancja uzależniająca":"Kofeina","Czas działania nikotyny":"Krótko (kilka godzin)","Najczęstszy objaw odstawienia":"Wzrost apetytu i drażliwość"}
+
+{"Główna substancja uzależniająca":"string","Czas działania nikotyny":"string","Najczęstszy objaw odstawienia":"string"}
