@@ -807,45 +807,21 @@
          * Ułatwiająca funkcja do pobierania danych na podstawie stanu checkboxa.
          * Zwraca Promise, który rozwiązuje się z tablicą rekordów.
          */
-        function getRecords() {
-            return new Promise((resolve, reject) => {
-                if (useGlobalDataCheckbox.checked) {
-                    // Dane ze zmiennej globalnej
-                    if (globalRecords.length > 0) {
-                        console.log('Dane pobrane ze zmiennej globalnej.');
-                        resolve(globalRecords);
-                    } else {
-                        reject('Brak danych w zmiennej globalnej. Wczytaj pliki JSON.');
-                    }
+        async function getRecords() {
+            if (useGlobalDataCheckbox.checked) {
+                if (globalRecords.length > 0) {
+                    console.log('Dane pobrane ze zmiennej globalnej.');
+                    return globalRecords;
                 } else {
-                    // Dane z serwera (POST)
-                    console.log('Pobieranie danych z serwera...');
-                    // TUTAJ MIEJSCE NA LOGIKĘ POBIERANIA Z SERWERA (fetch/axios POST)
-                    // Przykład:
-                    /*
-                    fetch('/api/get-records', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({})
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Dane pobrane z serwera.', data);
-                        resolve(data); // data to powinna być array obiektów (rekordów)
-                    })
-                    .catch(error => {
-                        console.error('Błąd pobierania danych z serwera:', error);
-                        reject('Nie udało się pobrać danych z serwera.');
-                    });
-                    */
-                    
-                    // TYMCZASOWO
-                    //const data = LoadEncryptedMessage(); - localStorage
-                    const data = downloadData();
-                    resolve(decryptArray(data) );
+                    throw 'Brak danych w zmiennej globalnej. Wczytaj pliki JSON.';
                 }
-            });
+            } else {
+                console.log('Pobieranie danych z serwera...');
+                const data = await downloadData();
+                return decryptArray(data);
+            }
         }
+
 
         // funkcja zwracająca tablicę odszyfrowanych danych
         async function decryptArray(data) {
@@ -1040,7 +1016,7 @@
                     try {
 
                         //const data = LoadEncryptedMessage(); - localStorage
-                        const data = downloadData();
+                        const data = await downloadData();
                         const DataToExport = await decryptArray(data);
                         //console.log(DataToExport, DataToExport.length);
                         if (DataToExport.length >= 1){
@@ -1048,13 +1024,13 @@
                         }
                         if (confirm('Zapisano zawartość bazy danych. Czy wciąż chcesz ją wyczyścić?')) {
                             // ClearServerSimulation();    - localStorage
-                            clearData();
+                            await clearData();
                         }    
                         
                     } catch (error) {
                         if (confirm('Nie można zapisać kopii bazy danych. Czy wciąż chcesz ją wyczyścić?')) {
                             // ClearServerSimulation();    - localStorage
-                            clearData();
+                            await clearData();
                         }  
                     }                                    
                 }
