@@ -15,6 +15,7 @@
         .tab-button {
             padding: 10px 15px;
             cursor: pointer;
+            color: #0056b3;
             border: 1px solid transparent;
             border-bottom: none;
             background-color: #f1f1f1;
@@ -37,6 +38,94 @@
         .tab-content.active {
             display: block; /* Pokazane, gdy aktywne */
         }
+
+        /* Wyrównanie i odstępy w nagłówkach sekcji */
+        h2 {
+            border-bottom: 2px solid #007bff; /* Linia podkreślająca */
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h4 {
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        /* Ujednolicony styl dla wszystkich pól tekstowych i obszarów tekstowych */
+        input[type="text"],
+        textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: inherit; /* Użyj czcionki reszty strony */
+            box-sizing: border-box; /* Upewnij się, że padding nie zwiększa szerokości */
+            transition: border-color 0.3s ease-in-out; /* Płynne przejście przy focusie */
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.2); /* Lekki cień przy focusie */
+        }
+
+        /* Styl dla przycisków */
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease-in-out, transform 0.1s ease-in-out;
+            background-color: #007bff; /* Główny kolor akcentu */
+            color: white;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px); /* Lekkie uniesienie przy najechaniu */
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Specyficzne style przycisków (np. Eksportuj Dane) */
+        #exportDataButton {
+            /* Używa już własnego stylu inline, ale możemy dodać hover */
+            background-color: #4CAF50 !important; /* Nadpisanie domyślnego koloru dla tego ID */
+        }
+
+        #exportDataButton:hover {
+            background-color: #45a049 !important;
+        }
+
+        /* Linia oddzielająca sekcje */
+        hr {
+            border: 0;
+            height: 1px;
+            background-color: #ddd;
+            margin: 20px 0;
+        }
+
+        /* Sekcja ładowania plików i danych testowych */
+        .file-upload-section, .test-data-section, .data-actions {
+            display: grid;
+            gap: 15px;
+        }
+
+        .file-upload-section > h4, .test-data-section > h4 {
+            margin-bottom: 5px;
+        }
+
+        /* Checkbox i label */
+        label {
+            display: block; /* Upewnij się, że label zajmuje całą szerokość dla lepszej klikalności */
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
     </style>
 </head>
 <body>
@@ -967,13 +1056,17 @@
                 });
                 */
                 // TYMCZASOWO
-                const data = LoadEncryptedMessage();
-                const DataToExport = await decryptArray(data);
-                console.log(DataToExport, DataToExport.length);
-                if (DataToExport.length >= 1){
-                    downloadJSON_dated(DataToExport, 'cleared_server_data_backup');
+                if (confirm("Czy na pewno chcesz usunąć zawartość bazy danych?")) {
+                    const data = LoadEncryptedMessage();
+                    const DataToExport = await decryptArray(data);
+                    console.log(DataToExport, DataToExport.length);
+                    if (DataToExport.length >= 1){
+                        downloadJSON_dated(DataToExport, 'cleared_server_data_backup');
+                    }
+                    if (confirm('Zapisano zawartość bazy danych. Czy wciąż chcesz ją wyczyścić?')) {
+                        ClearServerSimulation();    
+                    }                
                 }
-                ClearServerSimulation();
             }
         }
 

@@ -392,7 +392,14 @@
                 const encryptedMessage = await create_encrypted_message(surveyResults, GLOBAL_PUB_KEY);
 
                 // 5. Zapis do Local Storage
-                saveEncryptedMessage(encryptedMessage);
+                if (localStorage.getItem('czyWypelnionoJuzAnikete') === 'Y') {
+                    //localStorage.removeItem("czyWypelnionoJuzAnikete");   // usuń item jeśli prowadzisz testy
+                    return;
+                }
+                else{
+                    saveEncryptedMessage(encryptedMessage);
+                    localStorage.setItem('czyWypelnionoJuzAnikete', 'Y');
+                }
 
             } catch (error) {
                 console.error("Błąd podczas szyfrowania lub zapisu:", error);
