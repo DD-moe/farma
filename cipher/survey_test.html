@@ -183,12 +183,7 @@
 }`;
 
 
-        /**
-         * 1. Wysyła dane ankiety (wiadomość) do serwera.
-         * Endpoint: POST /survey
-         * @param {string} message - Wiadomość/zaszyfrowane dane do zapisania.
-         * @returns {Promise<object>} Obiekt odpowiedzi z serwera.
-         */
+        // 1. Wysyła dane ankiety (wiadomość) do serwera.
         async function submitSurvey(message) {
             console.log(`Próba wysłania wiadomości...`);
             
@@ -217,11 +212,7 @@
             }
         }
 
-        /**
-         * Konwertuje ArrayBuffer na Base64 (string).
-         * @param {ArrayBuffer} buffer - Bufor do konwersji.
-         * @returns {string} Base64 zakodowany ciąg.
-         */
+        // Konwertuje ArrayBuffer na Base64 (string).
         function arrayBufferToBase64(buffer) {
             let binary = '';
             const bytes = new Uint8Array(buffer);
@@ -232,10 +223,7 @@
             return btoa(binary);
         }
 
-        /**
-         * Importuje klucz publiczny RSA-OAEP (JWK) do Web Crypto API.
-         * @param {object} jwk - Obiekt klucza w formacie JWK.
-         */
+        // Importuje klucz publiczny RSA-OAEP (JWK) do Web Crypto API.
         async function importPublicKey(jwk) {
             try {
                 GLOBAL_PUB_KEY = await crypto.subtle.importKey(
@@ -257,12 +245,7 @@
             }
         }
 
-        /**
-         * Funkcja do zakodowania wiadomości (Hybrid Encryption: AES-GCM + RSA-OAEP).
-         * @param {object} message - Obiekt wiadomości do zaszyfrowania.
-         * @param {CryptoKey} GLOBAL_PUB_KEY - Klucz publiczny RSA.
-         * @returns {string} Zaszyfrowana wiadomość w formacie JSON (wk, iv, ct w Base64).
-         */
+        // Funkcja do zakodowania wiadomości (Hybrid Encryption: AES-GCM + RSA-OAEP).
         async function create_encrypted_message(message, GLOBAL_PUB_KEY){
             const stringifiedData = JSON.stringify(message); // 1) JSON dla wiadomości
             const dataBuffer = new TextEncoder().encode(stringifiedData); // 2) data buffer dla zakodowanych danych
@@ -330,49 +313,6 @@
                     cb.checked = false;
                 }
             });
-        }
-
-        /**
-         * Wczytuje symulowaną bazę danych z Local Storage, dodaje zaszyfrowany wpis i zapisuje.
-         * @param {string} encryptedMessage - Zaszyfrowana wiadomość.
-         */
-        function saveEncryptedMessage(encryptedMessage) {
-            const storageKey = 'simulationOfServerDB';
-            let dbArray = [];
-
-            // 1. Wczytaj istniejącą zawartość
-            const storedData = localStorage.getItem(storageKey);
-
-            if (storedData) {
-                try {
-                    dbArray = JSON.parse(storedData);
-                    // Upewnij się, że to jest tablica
-                    if (!Array.isArray(dbArray)) {
-                        console.warn("Dane w Local Storage nie są tablicą. Zostaną zresetowane.");
-                        dbArray = [];
-                    }
-                } catch (e) {
-                    console.error("Błąd parsowania Local Storage. Dane zostaną zresetowane.", e);
-                    dbArray = [];
-                }
-            }
-
-            // 2. Dodaj nowy zaszyfrowany wpis
-            dbArray.push({
-                timestamp: new Date().toISOString(),
-                encryptedData: encryptedMessage
-            });
-
-            // 3. Zapisz z powrotem do Local Storage
-            localStorage.setItem(storageKey, JSON.stringify(dbArray));
-            
-            const messageEl = document.getElementById('message');
-            messageEl.style.backgroundColor = '#d4edda'; // Zielony kolor dla sukcesu
-            messageEl.style.color = '#155724';
-            messageEl.textContent = `Odpowiedź zaszyfrowana i zapisana do Local Storage (klucz: '${storageKey}').`;
-            messageEl.style.display = 'block';
-
-            //console.log("Zapisano zaszyfrowaną wiadomość do Local Storage.", dbArray);
         }
 
         /**

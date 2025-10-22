@@ -152,6 +152,10 @@
             </div>
 
             <hr>
+            <h4>Wprowadź url serwera</h4>
+            <input type="text" id="urlInput" placeholder="np.   https://frog01-21435.wykr.es" style="width: 100%;">
+
+            <hr>
 
             <h4>Schemat Danych (JSON)</h4>
             <p>Zdefiniuj strukturę danych. Użyj nazw pól (keys) identycznych jak w bazie danych, przypisując im typy (np. 'int', 'float', 'string', 'boolean').</p>
@@ -402,14 +406,15 @@
         // --- Logika dla Eksportu Danych ---
         document.getElementById('exportDataButton').addEventListener('click', () => {
             const token = document.getElementById('tokenInput').value;
+            const url = document.getElementById('urlInput').value
             const schema = document.getElementById('schemaTextarea').value;
             const privKey = document.getElementById('privateKeyTextarea').value;
             const pubKey = document.getElementById('publicKeyTextarea').value;
             const messageElement = document.getElementById('exportMessage');
 
             // Walidacja podstawowa
-            if (!token || !schema || !privKey || !pubKey) {
-                messageElement.textContent = "Proszę uzupełnić wszystkie pola (Token, Schemat, Klucze)!";
+            if (!token || !schema || !privKey || !pubKey || !url) {
+                messageElement.textContent = "Proszę uzupełnić wszystkie pola (Token, Schemat, Klucze, Url)!";
                 messageElement.style.color = "red";
                 return;
             }
@@ -424,7 +429,8 @@
                 const analyticData = {
                     token: token,
                     schema: schemaObj,
-                    privKey: privKeyObj 
+                    privKey: privKeyObj,
+                    url: url 
                 };
                 downloadJSON_dated(analyticData, 'analytic');
 
@@ -462,6 +468,7 @@
         let GLOBAL_PRIV_KEY = null;
         let GLOBAL_SCHEMA = null;
         let GLOBAL_TOKEN = null;
+        let API_BASE_URL = null;
 
         const ERROR_DISPLAY = document.getElementById('errorMessage');
         const TEST_BUTTON = document.getElementById('testEncryptionButton');
@@ -495,6 +502,7 @@
                         }
                         GLOBAL_TOKEN = data.token;
                         GLOBAL_SCHEMA = data.schema;
+                        API_BASE_URL = data.url;
                         await importPrivateKey(data.privKey);
                         document.getElementById('analyticDataHeader').style.color = 'green';
                     }
@@ -510,6 +518,7 @@
                         GLOBAL_PRIV_KEY = null;
                         GLOBAL_SCHEMA = null;
                         GLOBAL_TOKEN = null;
+                        API_BASE_URL = null;
                         document.getElementById('analyticDataHeader').style.color = 'black';
                     }
                     checkDependencies();
@@ -782,38 +791,6 @@
         // ===============================================
 
 
-        // TYMCZASOWA FUNKCJA DO ŁADOWANIA DANYCH Z LOCAL-STORAGE
-        function LoadEncryptedMessage() {
-            const storageKey = 'simulationOfServerDB';
-            let dbArray = [];
-
-            // 1. Wczytaj istniejącą zawartość
-            const storedData = localStorage.getItem(storageKey);
-
-            if (storedData) {
-                try {
-                    dbArray = JSON.parse(storedData);
-                    // Upewnij się, że to jest tablica
-                    if (!Array.isArray(dbArray)) {
-                        console.warn("Dane w Local Storage nie są tablicą. Zostaną zresetowane.");
-                        dbArray = [];
-                    }
-                } catch (e) {
-                    console.error("Błąd parsowania Local Storage. Dane zostaną zresetowane.", e);
-                    dbArray = [];
-                }
-            }
-
-            return dbArray;
-        }
-
-        // TYMCZASOWA FUNKCJA DO CZYSZCZENIA DANYCH Z LOCAL-STORAGE
-        function ClearServerSimulation(){
-            const storageKey = 'simulationOfServerDB';
-            localStorage.removeItem(storageKey);
-        }
-
-
         // Zmienna globalna przechowująca połączone rekordy JSON
         let globalRecords = [];
 
@@ -863,7 +840,8 @@
                     */
                     
                     // TYMCZASOWO
-                    const data = LoadEncryptedMessage();
+                    //const data = LoadEncryptedMessage(); - localStorage
+                    const data = downloadData();
                     resolve(decryptArray(data) );
                 }
             });
@@ -1057,14 +1035,16 @@
                 */
                 // TYMCZASOWO
                 if (confirm("Czy na pewno chcesz usunąć zawartość bazy danych?")) {
-                    const data = LoadEncryptedMessage();
+                    //const data = LoadEncryptedMessage(); - localStorage
+                    const data = downloadData();
                     const DataToExport = await decryptArray(data);
-                    console.log(DataToExport, DataToExport.length);
+                    //console.log(DataToExport, DataToExport.length);
                     if (DataToExport.length >= 1){
                         downloadJSON_dated(DataToExport, 'cleared_server_data_backup');
                     }
                     if (confirm('Zapisano zawartość bazy danych. Czy wciąż chcesz ją wyczyścić?')) {
-                        ClearServerSimulation();    
+                        // ClearServerSimulation();    - localStorage
+                        clearData();
                     }                
                 }
             }
@@ -1106,6 +1086,72 @@
         clearDataBtn.addEventListener('click', handleClearData);
         exportDataBtn.addEventListener('click', handleExportData);
 
+
+        /**
+         * 2. Pobiera wszystkie zapisane dane z bazy.
+         * Endpoint: POST /download (Wymaga autoryzacji)
+         * @returns {Promise<Array<object>>} Tablica obiektów zawierających timestamp i encryptedData.
+         */
+        async function downloadData() {
+            console.log(`Próba pobrania danych...`);
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/download`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${ACCESS_TOKEN}`, // Wymagany nagłówek autoryzacyjny
+                        'Content-Type': 'application/json'
+                    },
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    console.log(`Sukces! Pobrano ${result.length} rekordów.`, result);
+                    return result;
+                } else {
+                    console.error(`Błąd pobierania (Status: ${response.status}):`, result.message);
+                    throw new Error(result.message || `Autoryzacja nieudana lub błąd serwera. Kod: ${response.status}`);
+                }
+
+            } catch (error) {
+                console.error("Błąd połączenia podczas pobierania danych:", error.message);
+                throw error;
+            }
+        }
+
+        /**
+         * 3. Czyści wszystkie rekordy w bazie danych.
+         * Endpoint: POST /clear (Wymaga autoryzacji)
+         * @returns {Promise<object>} Obiekt odpowiedzi z serwera po operacji czyszczenia.
+         */
+        async function clearData() {
+            console.log(`Próba czyszczenia bazy danych...`);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/clear`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${ACCESS_TOKEN}`, // Wymagany nagłówek autoryzacyjny
+                        'Content-Type': 'application/json'
+                    },
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    console.log("Sukces! Baza danych została wyczyszczona:", result.message);
+                    return result;
+                } else {
+                    console.error(`Błąd czyszczenia (Status: ${response.status}):`, result.message);
+                    throw new Error(result.message || `Autoryzacja nieudana lub błąd serwera. Kod: ${response.status}`);
+                }
+
+            } catch (error) {
+                console.error("Błąd połączenia podczas czyszczenia bazy:", error.message);
+                throw error;
+            }
+        }
 
 
     </script>
