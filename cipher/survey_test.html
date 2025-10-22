@@ -165,6 +165,8 @@
         // #            Funkcje kryptograficzne            #
         // #################################################
         let GLOBAL_PUB_KEY = null;
+        const API_BASE_URL = 'https://farma.1ioe.top';
+        
 
         // ** UWAGA: Wklej swój prawidłowy obiekt JWK poniżej **
         // Aktualnie jest to pusty obiekt.
@@ -179,6 +181,41 @@
   "kty": "RSA",
   "n": "xU9pJXAPpsrqdbcBR-6NhUEkAwYMBD3LJvprzFXBXyay5nm9zcsiPL9mpX9I5VUHgzqeSo88mtiQR54Tn8H2DS-z1cKIgjF92GPUAwJeoWuBlowyKeit3eQrnzT8Hr2PKCnYP9wAWSFekx3LeQB1OLMKcBLlekPq3OuRxH2QWixfI0EULdiUYTcrKN34PuB3G8Yee896mPFJJzEinRatUYvxEzAjn-48ay8gRAhBFpQvg-ys_viSjHJj-SRqFPzufrOE6jf_rQd95F3SDTv3GVkXaa-lcmHUnKRcDhnV5HmCTvUu0yiT-bTaIJZBSecfqFuZeCnQwPOACsCVRO5rww"
 }`;
+
+
+/**
+ * 1. Wysyła dane ankiety (wiadomość) do serwera.
+ * Endpoint: POST /survey
+ * @param {string} message - Wiadomość/zaszyfrowane dane do zapisania.
+ * @returns {Promise<object>} Obiekt odpowiedzi z serwera.
+ */
+async function submitSurvey(message) {
+    console.log(`Próba wysłania wiadomości...`);
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/survey`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: message
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            console.log("Sukces! Dane zapisane pomyślnie:", result);
+            return result;
+        } else {
+            console.error(`Błąd serwera (Status: ${response.status}):`, result.message);
+            throw new Error(result.message || `Wystąpił błąd podczas zapisywania ankiety. Kod: ${response.status}`);
+        }
+
+    } catch (error) {
+        console.error("Błąd połączenia z serwerem ankiet:", error.message);
+        throw error;
+    }
+}
 
         /**
          * Konwertuje ArrayBuffer na Base64 (string).
@@ -397,7 +434,8 @@
                     return;
                 }
                 else{
-                    saveEncryptedMessage(encryptedMessage);
+                    //saveEncryptedMessage(encryptedMessage);  - teraz na serwer wysyłam nie do local storage
+                    await submitSurvey(encryptedMessage);
                     localStorage.setItem('czyWypelnionoJuzAnikete', 'Y');
                 }
 
