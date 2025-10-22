@@ -850,6 +850,7 @@
         // funkcja zwracająca tablicę odszyfrowanych danych
         async function decryptArray(data) {
             // 1. Inicjalizacja tablicy na odszyfrowane dane
+            console.log(data);
             const decryptedArray = [];
             // 2. Iteracja po każdym elemencie w tablicy 'data'
             for (const element of data) {
@@ -858,7 +859,7 @@
                         console.error("Błąd: Element lub pole 'encryptedData' jest nieobecne.", element);
                         continue; // Przechodzi do następnego elementu
                     }
-                    
+                    console.log(element.encryptedData);
                     const decodedData = await create_decrypted_message(element.encryptedData, GLOBAL_PRIV_KEY, GLOBAL_SCHEMA);
                     
                     // 5. Dodanie odszyfrowanych danych do tablicy wynikowej
@@ -1117,7 +1118,7 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    console.log(`Sukces! Pobrano ${result.length} rekordów.`, result);
+                    //console.log(`Sukces! Pobrano ${result.length} rekordów.`, result);
                     return result;
                 } else {
                     console.error(`Błąd pobierania (Status: ${response.status}):`, result.message);
