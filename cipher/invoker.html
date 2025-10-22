@@ -826,7 +826,6 @@
         // funkcja zwracająca tablicę odszyfrowanych danych
         async function decryptArray(data) {
             // 1. Inicjalizacja tablicy na odszyfrowane dane
-            console.log(data);
             const decryptedArray = [];
             // 2. Iteracja po każdym elemencie w tablicy 'data'
             for (const element of data) {
@@ -835,7 +834,6 @@
                         console.error("Błąd: Element lub pole 'encryptedData' jest nieobecne.", element);
                         continue; // Przechodzi do następnego elementu
                     }
-                    console.log(element.encryptedData);
                     const decodedData = await create_decrypted_message(element.encryptedData, GLOBAL_PRIV_KEY, GLOBAL_SCHEMA);
                     
                     // 5. Dodanie odszyfrowanych danych do tablicy wynikowej
@@ -955,7 +953,6 @@
             dataDisplayArea.innerHTML = '<p>Ładowanie danych...</p>';
             getRecords()
                 .then(records => {
-                    console.log(records);
                     displayTable(records);
                 })
                 .catch(error => {
@@ -985,37 +982,8 @@
             } else {
                 // Usuń z serwera i zapisz zawartość bazy danych (zwróconą przez serwer)
                 console.log('Wysyłanie POST do usunięcia danych z serwera...');
-                // TUTAJ MIEJSCE NA LOGIKĘ USUWANIA Z SERWERA (POST - zwraca dane, potem usuwa)
-                // Przykład:
-                /*
-                fetch('/api/clear-records', { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({}) // Może zawierać token, etc.
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // data to powinna być array obiektów zwrócona przed usunięciem
-                    if (Array.isArray(data) && data.length > 0) {
-                        downloadJSON_dated(data, 'cleared_server_data_backup');
-                        loadStatus.innerText = '✅ Sukces: Dane z serwera usunięte. Utworzono kopię zapasową.';
-                        loadStatus.style.display = 'block';
-                    } else {
-                        alert('Serwer zwrócił puste dane lub błąd podczas usuwania.');
-                        loadStatus.style.display = 'none';
-                    }
-                })
-                .catch(error => {
-                    console.error('Błąd usuwania danych z serwera:', error);
-                    alert('Nie udało się usunąć danych z serwera.');
-                    loadStatus.style.display = 'none';
-                });
-                */
-                // TYMCZASOWO
                 if (confirm("Czy na pewno chcesz usunąć zawartość bazy danych?")) {
                     try {
-
-                        //const data = LoadEncryptedMessage(); - localStorage
                         const data = await downloadData();
                         const DataToExport = await decryptArray(data);
                         //console.log(DataToExport, DataToExport.length);
@@ -1023,13 +991,11 @@
                             downloadJSON_dated(DataToExport, 'cleared_server_data_backup');
                         }
                         if (confirm('Zapisano zawartość bazy danych. Czy wciąż chcesz ją wyczyścić?')) {
-                            // ClearServerSimulation();    - localStorage
                             await clearData();
                         }    
                         
                     } catch (error) {
                         if (confirm('Nie można zapisać kopii bazy danych. Czy wciąż chcesz ją wyczyścić?')) {
-                            // ClearServerSimulation();    - localStorage
                             await clearData();
                         }  
                     }                                    
