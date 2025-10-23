@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Przeglądarka kodu</title>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background: #fafafa;
+      color: #222;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+    select {
+      padding: 10px 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: white;
+      font-size: 15px;
+      margin-bottom: 20px;
+      min-width: 300px;
+    }
+    #explanation, #disclaimer {
+      max-width: 800px;
+      text-align: left;
+      margin: 10px 0;
+      line-height: 1.6;
+    }
+    #disclaimer {
+      font-size: 0.9em;
+      color: #777;
+      border-top: 1px solid #eee;
+      padding-top: 8px;
+    }
+    pre {
+      width: 800px;
+      background: #1e1e1e;
+      color: #ddd;
+      padding: 20px;
+      border-radius: 10px;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: monospace;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Przeglądarka kodu projektu</h1>
+
+  <select id="fileSelector"></select>
+
+  <div id="explanation"></div>
+  <pre id="code">Wybierz plik z listy powyżej...</pre>
+  <div id="disclaimer"></div>
+
+  <script>
+    // Lista fragmentów kodu
+    const codeFiles = [
+      [
+        "https://farma.git.1ioe.top/cipher/AES.html",
+        "Ten plik to test szyfrowania danych po stronie klienta przy użyciu AES-GCM, importowania i eksportowania kluczy w formacie jwk, oraz konwersji base64 do binary i z powrotem.",
+        "Niniejszy kod służył do testów wstępnych i nie jest używany przez właściwą aplikację.",
+        "AES.html"
+      ],
+      [
+        "https://farma.git.1ioe.top/cipher/client_analytic.html",
+        "Symulacja klienta - analityka w wersji bezserwerowej opartej na shared worker.",
+        "Niniejszy kod służył do testów wstępnych i nie jest używany przez właściwą aplikację.",
+        "client_analytic.html"
+      ],
+      [
+        "https://farma.git.1ioe.top/cipher/client_survey.html",
+        "Symulacja klienta - ankiety w wersji bezserwerowej opartej na shared worker.",
+        "Niniejszy kod służył do testów wstępnych i nie jest używany przez właściwą aplikację.",
+        "client_survey.html"
+      ],
+      [
+        "https://farma.git.1ioe.top/cipher/code.html",
+        "Przeglądarka do kodu całego projektu",
+        "Niniejszy kod jest częścią właściwego projektu",
+        "code.html"
+      ],
+      [
+        "https://farma.git.1ioe.top/cipher/exampleJSON.json",
+        "Przykładowy kod w JSON - w formacie w jakim klient analityk zapisuje lokalnie kopie zapasowe bazy danych",
+        "Niniejszy kod służy za część dokumentacji",
+        "exampleJSON.json"
+      ],        
+      [
+        "https://farma.git.1ioe.top/cipher/index.html",
+        "Kod 'landing page' dla całego projektu.",
+        "Niniejszy kod jest częścią właściwego projektu",
+        "index.html"
+      ],
+      [
+        "https://farma.git.1ioe.top/cipher/info.txt",
+        "Kod zawiera przykład formatu odpowiedzi zwracanej przez stronę ankiety, oraz jej schematu ",
+        "Niniejszy kod służy za część dokumentacji",
+        "info.txt"
+      ],       
+      [
+        "https://farma.git.1ioe.top/cipher/invoker.html",
+        "Panel analityka służący tworzeniu kluczy, tokenu dostępu, schematu poprawności danych - oraz zarządzającego bazą danych.",
+        "Niniejszy kod jest częścią właściwego projektu",
+        "invoker.html"
+      ],         
+      [
+        "https://farma.git.1ioe.top/cipher/RSS.html",
+        "Kod testowy, do sprawdzenia możliwości szyfrowania, oraz importowania i eksportu kluczy RSS OAEP",
+        "Niniejszy kod służył do testów wstępnych i nie jest używany przez właściwą aplikację.",
+        "RSS.html"
+      ],         
+      [
+        "https://farma.git.1ioe.top/cipher/server_simulator.js",
+        "Kod testowy, do symulowania serwera - shared worker",
+        "Niniejszy kod służył do testów wstępnych i nie jest używany przez właściwą aplikację.",
+        "server_simulator.js"
+      ],         
+      [
+        "https://farma.git.1ioe.top/cipher/server_simulator.js",
+        "Kod testowy, do symulowania serwera - shared worker",
+        "Niniejszy kod służył do testów wstępnych i nie jest używany przez właściwą aplikację.",
+        "server_simulator.js"
+      ],    
+      [
+        "https://farma.git.1ioe.top/cipher/server.py",
+        "Kod testowy, do symulowania serwera - shared worker",
+        "Niniejszy kod ze względów bezpieczeństawa na serwerze ma inną postać - tutaj pokazano go dla czytelności w najprostszej możliwej formie.",
+        "server.py"
+      ],    
+      [
+        "https://farma.git.1ioe.top/cipher/shared_worker.html",
+        "Kod testowy - sprawdza czy na danym urządzeniu i w danej przeglądarce możliwe jest wykorzystanie shared workers do dalszych testów.",
+        "Niniejszy kod służył do testów wstępnych i nie jest używany przez właściwą aplikację.",
+        "shared_worker.html"
+      ],      
+      [
+        "https://farma.git.1ioe.top/cipher/survey_test.html",
+        "Właściwy kod klienta - ankiety zawierający logikę szyfrowania i wysyłania danych na serwer oraz logikę zbierania odpowiedzi.",
+        "Niniejszy kod jest częścią właściwego projektu",
+        "survey_test.html"
+      ],  
+      [
+        "https://farma.git.1ioe.top/cipher/temporary_functions.html",
+        "Kod zawiera funkcje usunięte z invoker.html i survey_test.html, służące pirwotnie do symulowania serwera z użyciem localStorage.",
+        "Niniejszy kod służył do testów wstępnych i nie jest używany przez właściwą aplikację.",
+        "temporary_functions.html"
+      ],                                 
+    ];
+
+    const selector = document.getElementById('fileSelector');
+    const explanation = document.getElementById('explanation');
+    const disclaimer = document.getElementById('disclaimer');
+    const codeBlock = document.getElementById('code');
+
+    // Tworzymy listę opcji
+    codeFiles.forEach((item, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = item[3];
+      selector.appendChild(opt);
+    });
+
+    // Po zmianie wyboru
+    selector.addEventListener('change', async () => {
+      const selected = codeFiles[selector.value];
+      if (!selected) return;
+      const [url, desc, disc] = selected;
+
+      explanation.textContent = desc;
+      disclaimer.textContent = disc || "";
+
+      codeBlock.textContent = "Ładowanie kodu...";
+
+      try {
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(resp.statusText);
+        const text = await resp.text();
+        codeBlock.textContent = text;
+      } catch (e) {
+        codeBlock.textContent = "Nie udało się wczytać pliku: " + e.message;
+      }
+    });
+  </script>
+
+</body>
+</html>
